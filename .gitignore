@@ -1,0 +1,26 @@
+# LaTeX auxiliary files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+# Temporary LaTeX directories
+_minted-*/
+auto/
+
+# AI generated plans
+docs/superpowers/*
+
+# Keep intentionally generated presentation PDFs trackable.
+!presentation_light.pdf
+!presentation_dark.pdf
+!presentation_wide.pdf
+!presentation_wide_dark.pdf
+

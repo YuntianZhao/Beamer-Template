@@ -1,0 +1,302 @@
+% ---- Select light or dark color mode ----
+
+\newif\ifgithubdarkmode
+\DeclareOption{light}{\githubdarkmodefalse}
+\DeclareOption{dark}{\githubdarkmodetrue}
+\ExecuteOptions{light}
+\ProcessOptions\relax
+
+% ---- Select text and math fonts -----
+
+% Select fonts by engine
+\usepackage{iftex}
+
+\ifxetex
+\usepackage{unicode-math} % Math fonts in xetexorluatex
+\usepackage{libertinus-otf}  % Use libertinus font
+\setmathfont{XITSMath-Regular}[StylisticSet=1, range={cal,bfcal}, Extension = .otf, BoldFont = XITSMath-Bold]
+\let\mathbfscr\relax
+\let\mathbffrak\relax
+\usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
+\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\let\bm\symbf
+\newcommand{\mathbcal}[1]{\symbfcal{#1}}
+\newcommand{\mathbscr}[1]{\mathbfscr{#1}}
+\newcommand{\mathbfrak}[1]{\symbffrak{#1}}
+% \setmainfont{Libertinus Sans}  % Use sans-serif font instead of serif
+\else
+\ifluatex
+\usepackage{unicode-math} % Math fonts in xetexorluatex
+\usepackage{libertinus-otf}  % Use libertinus font
+\setmathfont{XITSMath-Regular}[StylisticSet=1, range={cal,bfcal}, Extension = .otf, BoldFont = XITSMath-Bold]
+\let\mathbfscr\relax
+\let\mathbffrak\relax
+\usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
+\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\let\bm\symbf
+\newcommand{\mathbcal}[1]{\symbfcal{#1}}
+\newcommand{\mathbscr}[1]{\mathbfscr{#1}}
+\newcommand{\mathbfrak}[1]{\symbffrak{#1}}
+% \setmainfont{Libertinus Sans}  % Use sans-serif font instead of serif
+\else
+\usepackage[utf8]{inputenc} % utf8 encoding in the input (.tex) file
+\usepackage[T1]{fontenc} % utf8 encoding in the output (.pdf) file
+\usepackage{libertinus-type1} % Use Libertinus font
+\usepackage[upint]{libertinust1math} % Use Libertinus math font
+\renewcommand{\sfdefault}{LibertinusSans-TLF}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\usepackage[cal=stixplain, scr=boondox, frak=euler]{mathalfa} % Lowercase and bold math alphabets
+\let\origmathcal\mathcal
+\renewcommand{\mathcal}[1]{\ifnum`#1>`Z \mathscr{#1}\else\origmathcal{#1}\fi}
+\renewcommand{\mathbcal}[1]{\ifnum`#1>`Z \mathbfscr{#1}\else\mbox{\boldmath$\origmathcal{#1}$}\fi}
+\newcommand{\mathbscr}[1]{\mathbfscr{#1}}
+\newcommand{\mathbfrak}[1]{\pmb{\mathfrak{#1}}}
+\newcommand{\hmmax}{0}
+\newcommand{\bmmax}{0}
+\usepackage{bm}
+\fi
+\fi
+
+% Select URL font
+\urlstyle{tt}
+
+% ---- Select Beamer theme ----
+
+% Select theme
+\usetheme{Boadilla}
+
+% Keep text sans-serif, but use the serif math fonts selected above
+\usefonttheme[onlymath]{serif}
+
+% Select color theme
+\usecolortheme[]{seagull}
+
+% Make covered elements transparent
+\setbeamercovered{transparent}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% ---- Adjust margins ----
+
+\setbeamersize{text margin left=5mm, text margin right=5mm}
+
+% ---- Adjust spacing ----
+
+% Set spacing between lines
+\usepackage[onehalfspacing]{setspace}
+
+% Set spacing on lines
+\usepackage{microtype}
+
+% Remove ligatures
+\ifxetex\else
+\DisableLigatures[f]{encoding = T1, family = * }
+\fi
+
+% ---- Adjust font sizes and shapes ----
+
+% Set title font
+\setbeamerfont{title}{size=\huge, shape=\scshape}
+
+% Set author font
+\setbeamerfont{author}{size=\large}
+
+% Set date font
+\setbeamerfont{date}{size=\large}
+
+% Set frame title font
+\setbeamerfont{frametitle}{shape=\scshape}
+
+% Ensure uniform capitalization of frame title, and lower title
+\setbeamertemplate{frametitle}{\vskip3mm\MakeLowercase{\insertframetitle}}
+
+% Format continuation count for multipage slides
+\setbeamertemplate{frametitle continuation}{[\insertcontinuationcount]}
+
+% Set list font
+\setbeamerfont{itemize/enumerate subbody}{size=\normalsize} % Second level
+\setbeamerfont{itemize/enumerate subsubbody}{size=\normalsize} % Third level
+
+% Set theorem fonts
+\setbeamerfont{block title}{size=\normalsize} % Title
+
+% Set button font
+\setbeamerfont{button}{size=\footnotesize}
+
+% ---- Adjust colors ----
+
+% Define colors
+\ifgithubdarkmode
+\definecolor{GitHubFg}{HTML}{E6EDF3}
+\definecolor{GitHubMuted}{HTML}{7D8590}
+\definecolor{GitHubCanvas}{HTML}{0D1117}
+\definecolor{GitHubCanvasSubtle}{HTML}{161B22}
+\definecolor{GitHubCanvasInset}{HTML}{010409}
+\definecolor{GitHubBorder}{HTML}{30363D}
+\definecolor{GitHubBlue}{HTML}{2F81F7}
+\definecolor{GitHubRed}{HTML}{F85149}
+\definecolor{GitHubGreen}{HTML}{3FB950}
+\definecolor{GitHubYellow}{HTML}{D29922}
+\definecolor{GitHubPurple}{HTML}{A371F7}
+\definecolor{GitHubCodeComment}{HTML}{8B949E}
+\definecolor{GitHubCodeKeyword}{HTML}{FF7B72}
+\definecolor{GitHubCodeString}{HTML}{A5D6FF}
+\definecolor{GitHubCodeNumber}{HTML}{79C0FF}
+\else
+\definecolor{GitHubFg}{HTML}{1F2328}
+\definecolor{GitHubMuted}{HTML}{656D76}
+\definecolor{GitHubCanvas}{HTML}{FFFFFF}
+\definecolor{GitHubCanvasSubtle}{HTML}{F6F8FA}
+\definecolor{GitHubCanvasInset}{HTML}{F6F8FA}
+\definecolor{GitHubBorder}{HTML}{D0D7DE}
+\definecolor{GitHubBlue}{HTML}{0969DA}
+\definecolor{GitHubRed}{HTML}{CF222E}
+\definecolor{GitHubGreen}{HTML}{1A7F37}
+\definecolor{GitHubYellow}{HTML}{9A6700}
+\definecolor{GitHubPurple}{HTML}{8250DF}
+\definecolor{GitHubCodeComment}{HTML}{6E7781}
+\definecolor{GitHubCodeKeyword}{HTML}{CF222E}
+\definecolor{GitHubCodeString}{HTML}{0A3069}
+\definecolor{GitHubCodeNumber}{HTML}{0550AE}
+\fi
+
+% Set page and text colors
+\setbeamercolor{background canvas}{bg=GitHubCanvas}
+\setbeamercolor{normal text}{fg=GitHubFg,bg=GitHubCanvas}
+
+% Set title color
+\setbeamercolor{title}{fg=GitHubFg}
+
+% Set frame title color
+\setbeamercolor{frametitle}{fg=GitHubFg}
+
+% Set itemized-list item color
+\setbeamercolor{itemize item}{fg=GitHubMuted} % First level
+\setbeamercolor{itemize subitem}{fg=GitHubMuted} % Second level
+\setbeamercolor{itemize subsubitem}{fg=GitHubMuted} % Third level
+
+% Set numbered-list item color
+\setbeamercolor{enumerate item}{fg=GitHubMuted} % First level
+\setbeamercolor{enumerate subitem}{fg=GitHubMuted} % Second level
+\setbeamercolor{enumerate subsubitem}{fg=GitHubMuted} % Third level
+
+% Set theorem colors
+\setbeamercolor{block title}{fg=GitHubFg,bg=GitHubCanvasSubtle} % Title
+\setbeamercolor{block body}{fg=GitHubFg,bg=GitHubCanvasSubtle} % Body
+
+% Set footer color
+\setbeamercolor{footline}{fg=GitHubMuted}
+
+% Set button colors
+\setbeamercolor{button}{fg=GitHubBlue, bg=GitHubCanvas}
+
+% ---- Format title slide ----
+
+% Enable advanced programming features
+\usepackage{etoolbox}
+
+% Define commands to insert slide URL
+\newcommand*{\inserturl}{} % Stored URL (empty by default)
+\newcommand*{\paperurl}[1]{\renewcommand*{\inserturl}{#1}} % URL defined in preamble
+
+\setbeamertemplate{title page}{%
+{\usebeamerfont{title}\usebeamercolor[fg]{title}\MakeLowercase{\inserttitle}\par}%
+{\color{GitHubFg}\rule{\textwidth}{1.5pt}\par}%
+\vspace{1.5cm}%
+{\usebeamerfont{author}\insertauthor\par}%
+\vspace{5mm}%
+{\usebeamerfont{date}\insertdate\par}%
+\ifdefempty{\inserturl}{}{\vspace{5mm}{\color{GitHubMuted}\footnotesize Available at \url{\inserturl}\par}}%
+\vfill}
+
+% ---- Format lists ----
+
+% Select itemized-list items
+\setbeamertemplate{itemize item}{$\square$} % First level
+\setbeamertemplate{itemize subitem}{\scalebox{1.25}{$\triangleright$}} % Second level
+\setbeamertemplate{itemize subsubitem}{\textendash} % Third level
+\providecommand{\labelitemiv}{}
+\renewcommand{\labelitemiv}{$\cdot$} % Fourth level
+
+% Select numbered-list items
+\setbeamertemplate{enumerate item}[default] % First level
+\setbeamertemplate{enumerate subitem}{\alph{enumii}.} % Second level
+\setbeamertemplate{enumerate subsubitem}{\roman{enumiii}.} % Third level
+
+% ---- Format figures and tables ----
+
+% ---- Format code listings and algorithms ----
+
+\usepackage{listings}
+\lstdefinestyle{minimalcode}{
+  basicstyle=\ttfamily\scriptsize,
+  backgroundcolor=\color{GitHubCanvasSubtle},
+  keywordstyle=\color{GitHubCodeKeyword},
+  commentstyle=\color{GitHubCodeComment},
+  stringstyle=\color{GitHubCodeString},
+  numbers=left,
+  numberstyle=\tiny\color{GitHubMuted},
+  xleftmargin=2em,
+  frame=none,
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=2
+}
+\lstset{style=minimalcode}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ---- Format figures and tables ----
+
+% Enhance table formatting
+\usepackage{booktabs}
+
+% Enable multiple rows in table
+\usepackage{multirow}
+
+% Customize captions
+\setbeamerfont{caption}{size=\footnotesize}
+\setbeamercolor{caption}{fg=GitHubMuted}
+\setbeamertemplate{caption}{\centering\usebeamerfont{caption}\usebeamercolor[fg]{caption}\insertcaption\par}
+\AtBeginEnvironment{figure}{\setlength{\abovecaptionskip}{-5pt}\setlength{\belowcaptionskip}{0pt}}
+\AtBeginEnvironment{table}{\setlength{\abovecaptionskip}{5pt}\setlength{\belowcaptionskip}{0pt}}
+
+% Center figures
+\let\oldincludegraphics\includegraphics 
+\renewcommand{\includegraphics}[2][]{\centering\oldincludegraphics[#1]{#2}}
+
+% ---- Format theorems ----
+
+\setbeamertemplate{blocks}[default]
+
+% Define additional theorems
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+% ---- Create section slide ----
+
+\newcommand*{\heading}[1]{\LARGE\scshape\color{GitHubFg}\singlespacing\MakeLowercase{#1}}
+
+% ---- Create last slide ----
+
+\newcommand{\lastslide}{{\setbeamercolor{background canvas}{bg=GitHubCanvasSubtle}\begin{frame}\end{frame}}}
+
+% ---- Remove or insert slide numbers ----
+
+% Remove slide numbers by default
+\setbeamertemplate{footline}{}
+
+% Uncomment the line below to insert slide numbers
+% \setbeamertemplate{footline}[frame number]
+
+% ---- Define shortcuts for pictograms ----
+
+\newcommand{\up}{\textuparrow\,}
+\newcommand{\down}{\textdownarrow\,}
+\newcommand{\then}{$\rightsquigarrow\,$}
+\newcommand{\so}{{$\Rightarrow\,$}}
