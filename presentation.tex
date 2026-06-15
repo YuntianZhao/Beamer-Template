@@ -1,5 +1,5 @@
 \documentclass[12pt, aspectratio=85, xcolor={dvipsnames}, usepdftitle=false]{beamer}
-\usepackage{presentation}
+\usepackage[pagenumbers]{presentation}
 \hypersetup{pdfpagemode=UseNone, hidelinks, pdfdisplaydoctitle=true,%
   %
   % Enter presentation title to populate PDF metadata:
@@ -83,20 +83,20 @@ pdftitle={Minimalist LaTeX Template for Academic Presentations}}
 \end{frame}
 
 \begin{frame}
-\frametitle{Slide with alerts}
-Lorem ipsum dolor sit amet:
-\begin{itemize}
-\item Here is a basic alert: \textcolor{GitHubBlue}{important text}
-\item Here is a basic alert on the second click: \textcolor<2>{GitHubBlue}{important text}
-\item Here is a positive alert on the third click: \textcolor<3>{GitHubGreen}{important text}
-\item Here are various alerts to flag the sign of numbers on the second and third clicks:
-\begin{itemize}
-\item Positive number: \textcolor<2-3>{GitHubGreen}{+5}
-\item Negative number: \textcolor<2>{GitHubRed}{-10}
-\item Zero number: \textcolor<3>{GitHubBlue}{0.0}
-\end{itemize}
-\item Overlay syntax: \texttt{<2>} applies the color on the second click, while \texttt{<2-3>} applies it on the second and third clicks
-\end{itemize}
+  \frametitle{Slide with alerts}
+  Lorem ipsum dolor sit amet:
+  \begin{itemize}
+    \item Here is a basic alert: \textcolor{GitHubBlue}{important text}
+    \item Here is a basic alert on the second click: \textcolor<2>{GitHubBlue}{important text}
+    \item Here is a positive alert on the third click: \textcolor<3>{GitHubGreen}{important text}
+    \item Here are various alerts to flag the sign of numbers on the second and third clicks:
+      \begin{itemize}
+        \item Positive number: \textcolor<2-3>{GitHubGreen}{+5}
+        \item Negative number: \textcolor<2>{GitHubRed}{-10}
+        \item Zero number: \textcolor<3>{GitHubBlue}{0.0}
+      \end{itemize}
+    \item Overlay syntax: \texttt{<2>} applies the color on the second click, while \texttt{<2-3>} applies it on the second and third clicks
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -238,23 +238,24 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Basic figure}
-  \includegraphics[scale=0.27,page=4]{\pdf}%
+  \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=4]{\pdf}%
 \end{frame}
 
 \begin{frame}
-  \frametitle{Basic figure with note}
+  \frametitle{Basic figure with caption and note}
   \begin{figure}
-    \includegraphics[scale=0.27,page=4]{\pdf}%
-    \caption{Period: January 2001--March 2022. Source: BLS data from the CPS and JOLTS.}
+    \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.70\textheight,page=4]{\pdf}%
+    \caption{Unemployment rate and job openings rate}
+    \figurenote{Period: January 2001--March 2022. Source: BLS data from the CPS and JOLTS.}
   \end{figure}
 \end{frame}
 
 \begin{frame}
   \frametitle{Collection of figures (one figure per click)}
-  \includegraphics<1>[scale=0.27,page=1]{\pdf}%
-  \includegraphics<2>[scale=0.27,page=2]{\pdf}%
-  \includegraphics<3>[scale=0.27,page=3]{\pdf}%
-  \includegraphics<4>[scale=0.27,page=5]{\pdf}%
+  \includegraphics<1>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=1]{\pdf}%
+  \includegraphics<2>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=2]{\pdf}%
+  \includegraphics<3>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=3]{\pdf}%
+  \includegraphics<4>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=5]{\pdf}%
 \end{frame}
 
 \begin{frame}
@@ -301,6 +302,8 @@ for signal in data:
     \caption{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
     tempor incididunt ut labore et dolore magna aliqua---sunt in culpa qui officia deserunt mollit anim id.}
   \end{table}
+
+  Something here.
 \end{frame}
 
 \begin{frame}

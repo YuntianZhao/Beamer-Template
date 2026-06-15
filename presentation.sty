@@ -1,9 +1,12 @@
-% ---- Select light or dark color mode ----
+% ---- Select light or dark color mode and slide numbers ----
 
 \newif\ifgithubdarkmode
+\newif\ifgithubpagenumbers
 \DeclareOption{light}{\githubdarkmodefalse}
 \DeclareOption{dark}{\githubdarkmodetrue}
-\ExecuteOptions{light}
+\DeclareOption{nopagenumbers}{\githubpagenumbersfalse}
+\DeclareOption{pagenumbers}{\githubpagenumberstrue}
+\ExecuteOptions{light,nopagenumbers}
 \ProcessOptions\relax
 
 % ---- Select text and math fonts -----
@@ -202,13 +205,13 @@
 \newcommand*{\paperurl}[1]{\renewcommand*{\inserturl}{#1}} % URL defined in preamble
 
 \setbeamertemplate{title page}{%
-{\usebeamerfont{title}\usebeamercolor[fg]{title}\MakeLowercase{\inserttitle}\par}%
-{\color{GitHubFg}\rule{\textwidth}{1.5pt}\par}%
-\vspace{1.5cm}%
-{\usebeamerfont{author}\insertauthor\par}%
-\vspace{5mm}%
-{\usebeamerfont{date}\insertdate\par}%
-\ifdefempty{\inserturl}{}{\vspace{5mm}{\color{GitHubMuted}\footnotesize Available at \url{\inserturl}\par}}%
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}\MakeLowercase{\inserttitle}\par}%
+  {\color{GitHubFg}\rule{\textwidth}{1.5pt}\par}%
+  \vspace{1.5cm}%
+  {\usebeamerfont{author}\insertauthor\par}%
+  \vspace{5mm}%
+  {\usebeamerfont{date}\insertdate\par}%
+  \ifdefempty{\inserturl}{}{\vspace{5mm}{\color{GitHubMuted}\footnotesize Available at \url{\inserturl}\par}}%
 \vfill}
 
 % ---- Format lists ----
@@ -252,6 +255,9 @@
 
 % ---- Format figures and tables ----
 
+% Allow graphics to specify max width and max height constraints
+\usepackage[export]{adjustbox}
+
 % Enhance table formatting
 \usepackage{booktabs}
 
@@ -260,13 +266,15 @@
 
 % Customize captions
 \setbeamerfont{caption}{size=\footnotesize}
-\setbeamercolor{caption}{fg=GitHubMuted}
+\setbeamercolor{caption}{fg=GitHubFg}
 \setbeamertemplate{caption}{\centering\usebeamerfont{caption}\usebeamercolor[fg]{caption}\insertcaption\par}
 \AtBeginEnvironment{figure}{\setlength{\abovecaptionskip}{-5pt}\setlength{\belowcaptionskip}{0pt}}
-\AtBeginEnvironment{table}{\setlength{\abovecaptionskip}{5pt}\setlength{\belowcaptionskip}{0pt}}
+\AtBeginEnvironment{table}{\setlength{\abovecaptionskip}{5pt}\setlength{\belowcaptionskip}{-5pt}}
+
+\newcommand{\figurenote}[1]{\par{\footnotesize\singlespacing\color{GitHubMuted}#1\par}}
 
 % Center figures
-\let\oldincludegraphics\includegraphics 
+\let\oldincludegraphics\includegraphics
 \renewcommand{\includegraphics}[2][]{\centering\oldincludegraphics[#1]{#2}}
 
 % ---- Format theorems ----
@@ -284,15 +292,24 @@
 
 % ---- Create last slide ----
 
-\newcommand{\lastslide}{{\setbeamercolor{background canvas}{bg=GitHubCanvasSubtle}\begin{frame}\end{frame}}}
+\newcommand{\lastslide}{{\setbeamercolor{background canvas}{bg=GitHubCanvasSubtle}
+    \begin{frame}
+\end{frame}}}
 
 % ---- Remove or insert slide numbers ----
 
-% Remove slide numbers by default
-\setbeamertemplate{footline}{}
+\setbeamerfont{footline}{size=\scriptsize}
 
-% Uncomment the line below to insert slide numbers
-% \setbeamertemplate{footline}[frame number]
+\ifgithubpagenumbers
+\setbeamertemplate{footline}{%
+  \hfill%
+  \usebeamerfont{footline}\usebeamercolor[fg]{footline}%
+  \makebox[0pt][r]{\insertframenumber{} / \inserttotalframenumber\hspace{5mm}}%
+  \vspace{2mm}%
+}
+\else
+\setbeamertemplate{footline}{}
+\fi
 
 % ---- Define shortcuts for pictograms ----
 

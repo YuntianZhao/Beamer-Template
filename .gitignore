@@ -18,9 +18,17 @@ auto/
 # AI generated plans
 docs/superpowers/*
 
+# Generated presentation PDF
+presentation.pdf
+
 # Keep intentionally generated presentation PDFs trackable.
 !presentation_light.pdf
 !presentation_dark.pdf
 !presentation_wide.pdf
 !presentation_wide_dark.pdf
 
+# OS generated files
+.DS_Store
+
+# TODO
+TODO.md
