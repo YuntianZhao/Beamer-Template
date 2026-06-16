@@ -1,5 +1,9 @@
-\documentclass[12pt, aspectratio=85, xcolor={dvipsnames}, usepdftitle=false]{beamer}
-\usepackage[pagenumbers]{presentation}
+\providecommand{\presentationaspectratio}{43}
+\providecommand{\presentationmode}{light}
+\edef\presentationclassoptions{12pt,aspectratio=\presentationaspectratio,xcolor={dvipsnames},usepdftitle=false}
+\expandafter\documentclass\expandafter[\presentationclassoptions]{beamer}
+\edef\presentationpackageoptions{\presentationmode,pagenumbers}
+\expandafter\usepackage\expandafter[\presentationpackageoptions]{presentation}
 \hypersetup{pdfpagemode=UseNone, hidelinks, pdfdisplaydoctitle=true,%
   %
   % Enter presentation title to populate PDF metadata:
