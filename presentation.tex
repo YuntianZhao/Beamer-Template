@@ -457,17 +457,26 @@ for signal in data:
 
 % ---------------------------------------------------------------
 % LONG TABLE EXAMPLE
-% For long tables: add allowframebreaks to the frame.  Tables
-% do not need fragile, so frame breaks work natively.  The table
-% below has enough rows to fill roughly two frames.
+% Use xtabular (not tabular) with allowframebreaks for tables
+% that span multiple frames.  xtabular breaks rows automatically
+% across frame pages.  Use \tablefirsthead and \tablehead
+% to repeat the header on first and continuation frames.
 % ---------------------------------------------------------------
 \begin{frame}[allowframebreaks]
   \frametitle{Long table example}
   \footnotesize
-  \begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr}
+  \tablefirsthead{%
     \toprule
     Scenario & Demand & Stock & Orders & Service Level \\
-    \midrule
+    \midrule}
+  \tablehead{%
+    \toprule
+    Scenario & Demand & Stock & Orders & Service Level \\
+    \midrule}
+  \tabletail{\midrule}
+  \tablelasttail{\bottomrule}
+  \begin{xtabular}{@{\extracolsep\fill}lrrrr}
+    \shrinkheight{0pt}
     Baseline          & 10.0 & 35.2 & 18 & 0.9842 \\
     High Demand       & 15.0 & 41.8 & 22 & 0.9715 \\
     Low Demand        &  5.0 & 28.9 & 14 & 0.9938 \\
@@ -481,33 +490,14 @@ for signal in data:
     Low Holding Cost  & 10.0 & 42.3 & 19 & 0.9842 \\
     High Stockout     & 10.0 & 37.5 & 21 & 0.9788 \\
     Low Stockout      & 10.0 & 33.9 & 17 & 0.9889 \\
-    Seed 123          & 10.0 & 34.6 & 18 & 0.9837 \\
-    Seed 456          & 10.0 & 35.9 & 19 & 0.9849 \\
-    Seed 789          & 10.0 & 35.1 & 18 & 0.9840 \\
-    Mixed A           & 12.5 & 38.7 & 20 & 0.9763 \\
-    Mixed B           &  7.5 & 31.4 & 15 & 0.9912 \\
-    Mixed C           & 11.0 & 36.2 & 19 & 0.9815 \\
-    Tuned A           & 10.0 & 34.1 & 16 & 0.9872 \\
-    Tuned B           & 10.0 & 33.3 & 15 & 0.9884 \\
-    High Freq         & 10.0 & 35.7 & 22 & 0.9841 \\
-    Low Freq          & 10.0 & 34.9 & 14 & 0.9842 \\
-    Extreme A         & 20.0 & 48.2 & 28 & 0.9124 \\
-    Extreme B         &  2.0 & 22.1 &  8 & 0.9992 \\
     Correlated        & 10.0 & 37.1 & 19 & 0.9798 \\
     Seasonal          & 10.0 & 36.4 & 20 & 0.9811 \\
     Trend Up          & 10.0 & 39.8 & 21 & 0.9755 \\
     Trend Down        & 10.0 & 31.6 & 16 & 0.9893 \\
     Shock A           & 10.0 & 40.1 & 23 & 0.9612 \\
     Shock B           & 10.0 & 43.7 & 26 & 0.9488 \\
-    Robust A          & 10.0 & 34.3 & 17 & 0.9862 \\
-    Robust B          & 10.0 & 35.5 & 18 & 0.9854 \\
-    Pilot             & 10.0 & 34.8 & 18 & 0.9839 \\
-    Validation A      & 10.0 & 35.1 & 18 & 0.9842 \\
-    Validation B      & 10.0 & 34.9 & 18 & 0.9845 \\
-    Final             & 10.0 & 35.0 & 18 & 0.9843 \\
     \textbf{Mean}     & 10.0 & \textbf{35.2} & \textbf{18.1} & \textbf{0.9807} \\
-    \bottomrule
-  \end{tabular*}
+  \end{xtabular}
 \end{frame}
 
 \lastslide
