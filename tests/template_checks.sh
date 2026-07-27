@@ -104,4 +104,15 @@ check_present '\frame{\titlepage}' presentation-minimal.tex 'minimal starter sho
 check_present '\lastslide' presentation-minimal.tex 'minimal starter should demonstrate the template closing slide'
 check_absent '\addbibresource{references.bib}' presentation-minimal.tex 'minimal starter should compile before bibliography content is added'
 
+for file in presentation.sty presentation-minimal.tex; do
+  check_present 'Copyright 2026 Yuntian Zhao' "$file" "$file should identify the copyright holder"
+  check_present 'LaTeX Project Public License' "$file" "$file should identify the LPPL"
+  check_present "maintenance status 'author-maintained'" "$file" "$file should identify maintenance status"
+  check_present 'Current Maintainer of this work is Yuntian Zhao' "$file" "$file should identify the current maintainer"
+  check_present 'presentation.sty and presentation-minimal.tex' "$file" "$file should identify the complete LPPL work"
+done
+check_present '## License' README.md 'README should explain template licensing'
+check_present 'presentation.sty' README.md 'README license section should name the runtime work'
+check_present 'presentation-minimal.tex' README.md 'README license section should name the runtime work'
+
 exit "$fail"

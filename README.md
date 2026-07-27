@@ -91,3 +91,10 @@ Keep local Zotero file paths out of shared `.bib` files.
 ## Generated Files
 
 Generated PDFs and temporary build files are ignored by git. Do not edit generated PDFs manually; edit `presentation.tex`, `presentation.sty`, or the build script and regenerate outputs instead.
+
+## License
+
+The runtime template work consists of `presentation.sty` and
+`presentation-minimal.tex`. It is distributed under the LaTeX Project Public
+License, version 1.3c or later, with author-maintained status. The Current
+Maintainer is Yuntian Zhao. See `LICENSE.txt` for the complete license.
