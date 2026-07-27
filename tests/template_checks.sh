@@ -96,5 +96,12 @@ check_present 'latexmk -pdf' AGENTS.md 'AGENTS.md engine verification should use
 check_present 'latexmk -xelatex' AGENTS.md 'AGENTS.md engine verification should use latexmk for XeLaTeX'
 check_present 'biblatex' AGENTS.md 'AGENTS.md should explain why single raw engine passes are insufficient'
 check_present '.engine-check/' .gitignore 'engine compatibility build directories should be ignored by git'
+check_present '\providecommand{\presentationaspectratio}{43}' presentation-minimal.tex 'minimal starter should default to 4:3'
+check_present '\providecommand{\presentationmode}{light}' presentation-minimal.tex 'minimal starter should default to light mode'
+check_present '\providecommand{\presentationfontsize}{12pt}' presentation-minimal.tex 'minimal starter should default to 12pt'
+check_present '\expandafter\usepackage\expandafter[\presentationpackageoptions]{presentation}' presentation-minimal.tex 'minimal starter should load presentation.sty'
+check_present '\frame{\titlepage}' presentation-minimal.tex 'minimal starter should include a title frame'
+check_present '\lastslide' presentation-minimal.tex 'minimal starter should demonstrate the template closing slide'
+check_absent '\addbibresource{references.bib}' presentation-minimal.tex 'minimal starter should compile before bibliography content is added'
 
 exit "$fail"

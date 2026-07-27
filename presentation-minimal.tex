@@ -1,0 +1,31 @@
+\providecommand{\presentationaspectratio}{43}
+\providecommand{\presentationmode}{light}
+\providecommand{\presentationfontsize}{12pt}
+\edef\presentationclassoptions{\presentationfontsize,aspectratio=\presentationaspectratio,xcolor={dvipsnames},usepdftitle=false}
+\expandafter\documentclass\expandafter[\presentationclassoptions]{beamer}
+\edef\presentationpackageoptions{\presentationmode,pagenumbers}
+\expandafter\usepackage\expandafter[\presentationpackageoptions]{presentation}
+
+\hypersetup{
+  pdfpagemode=UseNone,
+  hidelinks,
+  pdfdisplaydoctitle=true,
+  pdftitle={Presentation Title}
+}
+
+\title{Presentation Title}
+\author{Author Name}
+\date{Location -- Date}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+  \frametitle{Main result}
+  Replace this text with the presentation's main result.
+\end{frame}
+
+\lastslide
+
+\end{document}
