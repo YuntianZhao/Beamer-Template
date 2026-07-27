@@ -33,13 +33,40 @@ Treat an engine or variant failure as a release blocker.
 
 ## Publish
 
-After verification, create the initial annotated semantic-version tag and push
-it. Then create the GitHub release and attach the runtime files:
+Update `version` for every later release. Release files must never be taken
+directly from a dirty working tree; the procedure below extracts them from the
+verified tag instead.
 
-```sh
-git tag -a v1.0.0 -m "v1.0.0"
-git push origin v1.0.0
-gh release create v1.0.0 presentation.sty presentation-minimal.tex LICENSE.txt --generate-notes --verify-tag
+Before making the repository public, audit its complete Git history for secrets
+and other material that must not be published. Tagging, pushing, changing
+visibility, and release creation require explicit user approval.
+
+```bash
+version=v1.1.0
+test -z "$(git status --porcelain)"
+git rev-parse --verify HEAD
+if git rev-parse --verify "$version" >/dev/null 2>&1; then
+  printf 'ERROR: tag %s already exists.\n' "$version" >&2
+  exit 1
+fi
+
+gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences
+git tag -a "$version" -m "$version"
+git push origin "$version"
+
+release_dir=$(mktemp -d "${TMPDIR:-/tmp}/beamer-template-release.XXXXXX")
+trap 'rm -rf "$release_dir"' EXIT
+git archive "$version" presentation.sty presentation-minimal.tex LICENSE.txt | tar -x -C "$release_dir"
+for file in presentation.sty presentation-minimal.tex LICENSE.txt; do
+  git show "$version:$file" | cmp - "$release_dir/$file"
+done
+
+gh release create "$version" \
+  "$release_dir/presentation.sty" \
+  "$release_dir/presentation-minimal.tex" \
+  "$release_dir/LICENSE.txt" \
+  --generate-notes \
+  --verify-tag
+rm -rf "$release_dir"
+trap - EXIT
 ```
-
-Tagging, pushing, and release creation require explicit user approval.

@@ -2,6 +2,8 @@
 
 A minimalist LaTeX Beamer template designed for research presentations, lectures, and seminar slides in economics, finance, and the social sciences.
 
+Find the source in the [public project repository](https://github.com/YuntianZhao/Beamer-Template) and download packaged files from [GitHub Releases](https://github.com/YuntianZhao/Beamer-Template/releases).
+
 The template philosophy is intentionally opinionated:
 
 - Separate style and content.
@@ -11,13 +13,23 @@ The template philosophy is intentionally opinionated:
 
 ## Quick Start
 
-Edit `presentation.tex` and build one presentation with `latexmk` using LuaLaTeX:
+Clone the repository, edit `presentation.tex`, and build the full example with LuaLaTeX:
 
 ```sh
 latexmk -lualatex presentation.tex
 ```
 
-This handles the required LaTeX reruns and bibliography processing for the sample `references.bib` file.
+For a new presentation, start from the smaller released template:
+
+```sh
+latexmk -lualatex presentation-minimal.tex
+```
+
+## Prerequisites
+
+Biber is required, including for the minimal starter, because `presentation.sty` loads the `biblatex-chicago` backend. Use `latexmk` so Biber and all required LaTeX reruns are invoked automatically.
+
+A complete TeX Live installation is the simplest setup. Package-level installations need Beamer, `iftex`, Libertinus and XITS fonts, Source Code Pro, `unicode-math`, `mathalpha`, `setspace`, `microtype`, `etoolbox`, `biblatex-chicago`, `listings`, `algorithm`, `algorithmicx`, `adjustbox`, `booktabs`, `multirow`, and `xtab`.
 
 ## Preamble Controls
 
@@ -91,6 +103,10 @@ Keep local Zotero file paths out of shared `.bib` files.
 ## Generated Files
 
 Generated PDFs and temporary build files are ignored by git. Do not edit generated PDFs manually; edit `presentation.tex`, `presentation.sty`, or the build script and regenerate outputs instead.
+
+## Acknowledgements
+
+Thank you to Pascal Michaillat for the excellent [Minimalist LaTeX Template for Academic Presentations](https://github.com/pmichaillat/latex-presentation), which inspired and provided the foundation for this template.
 
 ## License
 

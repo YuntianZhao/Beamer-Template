@@ -122,6 +122,10 @@ check_file_absent 'presentation_dark.pdf' 'normal dark PDF should not be left at
 check_file_absent 'presentation_wide.pdf' 'normal wide PDF should not be left at repository root'
 check_file_absent 'presentation_wide_dark.pdf' 'normal wide dark PDF should not be left at repository root'
 check_present 'latexmk -lualatex presentation.tex' README.md 'README quick start should build one user-facing deck with latexmk and LuaLaTeX'
+check_present 'latexmk -lualatex presentation-minimal.tex' README.md 'README should document the released minimal starter command'
+check_present 'Biber is required' README.md 'README should explicitly document the Biber dependency'
+check_present 'https://github.com/pmichaillat/latex-presentation' README.md 'README should acknowledge the upstream presentation project'
+check_present 'https://github.com/YuntianZhao/Beamer-Template/releases' README.md 'README should link to public releases'
 check_absent_regex '^lualatex presentation\.tex$' README.md 'README should not recommend raw lualatex for the bibliography-using sample deck'
 check_present 'output/test/' README.md 'README should document output/test as the generated PDF directory'
 check_present 'presentation_10pt_43_light.pdf' README.md 'README should list the font-size/aspect-ratio build matrix'
@@ -160,6 +164,10 @@ check_present 'bash tests/template_checks.sh' RELEASING.md 'release instructions
 check_present './compile_all.sh' RELEASING.md 'release instructions should require the variant matrix'
 check_present 'latexmk -pdf' RELEASING.md 'release instructions should require pdfLaTeX verification'
 check_present 'gh release create' RELEASING.md 'release instructions should document GitHub release creation'
+check_present 'test -z "$(git status --porcelain)"' RELEASING.md 'release instructions should reject a dirty tree'
+check_present 'git archive "$version"' RELEASING.md 'release assets should be extracted from the tag'
+check_present 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'release instructions should document public visibility'
+check_absent 'git tag -a v1.0.0' RELEASING.md 'release instructions should not hard-code the initial tag command'
 check_present 'RELEASING.md' AGENTS.md 'agent instructions should point to the release checklist'
 
 exit "$fail"

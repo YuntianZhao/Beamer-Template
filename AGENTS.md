@@ -79,5 +79,12 @@ Generated PDFs and temporary build directories are ignored by git. Never edit ge
 ## Releases
 
 Follow `RELEASING.md` for the required runtime files, compatibility matrix, and
-GitHub release procedure. Never tag, push, or create a release without explicit
-user approval.
+GitHub release procedure. A public release requires:
+
+- A clean worktree and reviewed Git history.
+- A package version matching the tag.
+- Assets extracted from the tag.
+- Verification of public asset access after release.
+
+Never tag, push, change repository visibility, or create a release without
+explicit user approval.
