@@ -112,8 +112,8 @@
 % Set frame title font
 \setbeamerfont{frametitle}{shape=\scshape}
 
-% Ensure uniform capitalization of frame title, and lower title
-\setbeamertemplate{frametitle}{\vskip3mm\MakeLowercase{\insertframetitle}}
+% Keep user-written capitalization in frame titles.
+\setbeamertemplate{frametitle}{\vskip3mm\insertframetitle}
 
 % Format continuation count for multipage slides
 \setbeamertemplate{frametitle continuation}{[\insertcontinuationcount]}
@@ -205,7 +205,7 @@
 \newcommand*{\paperurl}[1]{\renewcommand*{\inserturl}{#1}} % URL defined in preamble
 
 \setbeamertemplate{title page}{%
-  {\usebeamerfont{title}\usebeamercolor[fg]{title}\MakeLowercase{\inserttitle}\par}%
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}%
   {\color{GitHubFg}\rule{\textwidth}{1.5pt}\par}%
   \vspace{1.5cm}%
   {\usebeamerfont{author}\insertauthor\par}%
@@ -268,6 +268,35 @@
 % Enable multi-page tables in frames
 \usepackage{xtab}
 
+% ---- Format references ----
+
+% Load biblatex with Chicago author-date style (biber backend)
+\usepackage[backend=biber,authordate,sorting=nyt,%
+  giveninits=true,%
+  isbn=false,url=false,doi=false,eprint=false]{biblatex-chicago}
+
+% Remove the per-entry bibliography icon in beamer frames
+\setbeamertemplate{bibliography item}{}
+
+% Keep bibliography entries in the main foreground color so they remain
+% legible in both light and dark themes (biblatex assigns distinct colors
+% to author/title/journal fields by default, which breaks on dark canvas)
+\setbeamercolor{bibliography entry author}{fg=GitHubFg}
+\setbeamercolor{bibliography entry title}{fg=GitHubFg}
+\setbeamercolor{bibliography entry note}{fg=GitHubFg}
+\setbeamercolor{bibliography entry journal}{fg=GitHubFg}
+\setbeamercolor{bibliography entry annotation}{fg=GitHubFg}
+\setbeamercolor{bibliography entry location}{fg=GitHubFg}
+\setbeamercolor{bibliography entry publisher}{fg=GitHubFg}
+\setbeamercolor{bibliography entry editor}{fg=GitHubFg}
+\setbeamercolor{bibliography entry edition}{fg=GitHubFg}
+\setbeamercolor{bibliography entry volumes}{fg=GitHubFg}
+\setbeamercolor{bibliography entry number}{fg=GitHubFg}
+\setbeamercolor{bibliography entry series}{fg=GitHubFg}
+\setbeamercolor{bibliography entry chapter}{fg=GitHubFg}
+\setbeamercolor{bibliography entry pages}{fg=GitHubFg}
+\setbeamercolor{bibliography entry type}{fg=GitHubFg}
+
 % Customize captions
 \setbeamerfont{caption}{size=\footnotesize}
 \setbeamercolor{caption}{fg=GitHubFg}
@@ -276,10 +305,6 @@
 \AtBeginEnvironment{table}{\setlength{\abovecaptionskip}{5pt}\setlength{\belowcaptionskip}{-5pt}}
 
 \newcommand{\figurenote}[1]{\par{\footnotesize\singlespacing\color{GitHubMuted}#1\par}}
-
-% Center figures
-\let\oldincludegraphics\includegraphics
-\renewcommand{\includegraphics}[2][]{\centering\oldincludegraphics[#1]{#2}}
 
 % ---- Format theorems ----
 
@@ -292,7 +317,7 @@
 
 % ---- Create section slide ----
 
-\newcommand*{\heading}[1]{\LARGE\scshape\color{GitHubFg}\singlespacing\MakeLowercase{#1}}
+\newcommand*{\heading}[1]{\LARGE\scshape\color{GitHubFg}\singlespacing #1}
 
 % ---- Create last slide ----
 

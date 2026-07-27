@@ -1,6 +1,7 @@
 \providecommand{\presentationaspectratio}{43}
 \providecommand{\presentationmode}{light}
-\edef\presentationclassoptions{12pt,aspectratio=\presentationaspectratio,xcolor={dvipsnames},usepdftitle=false}
+\providecommand{\presentationfontsize}{12pt}
+\edef\presentationclassoptions{\presentationfontsize,aspectratio=\presentationaspectratio,xcolor={dvipsnames},usepdftitle=false}
 \expandafter\documentclass\expandafter[\presentationclassoptions]{beamer}
 \edef\presentationpackageoptions{\presentationmode,pagenumbers}
 \expandafter\usepackage\expandafter[\presentationpackageoptions]{presentation}
@@ -23,6 +24,9 @@ pdftitle={Minimalist LaTeX Template for Academic Presentations}}
 
 % Enter URL to paper (can be commented out):
 \paperurl{https://github.com/link}
+
+% Enter bibliography database:
+\addbibresource{references.bib}
 
 \begin{document}
 \frame{\titlepage}
@@ -65,8 +69,17 @@ pdftitle={Minimalist LaTeX Template for Academic Presentations}}
     \item Sed do eiusmod tempor incididunt
     \item Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
     \item Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur
-    \item Ut labore et dolore magna aliqua
+\item Ut labore et dolore magna aliqua
   \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Slide with a reference}
+  \begin{itemize}
+    \item Trade liberalisation induces reallocation of market share across firms of heterogeneous productivity \parencite{melitz_impact_2003}
+    \item Author-year citations use \texttt{\textbackslash parencite\{\dots\}} (parenthesised) and \texttt{\textbackslash textcite\{\dots\}} (textual)
+    \item The bibliography is collected at the end of the presentation on the references slide
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -171,6 +184,47 @@ for signal in data:
 \end{frame}
 
 \begin{frame}
+  \frametitle{Three-column layout}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.31\textwidth}
+      \textbf{Left column}
+      \begin{itemize}
+        \item Use three columns for compact comparisons
+        \item Keep each column visually balanced
+        \item Avoid long paragraphs in narrow columns
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \textbf{Middle column}
+      \begin{equation*}
+        y = \alpha + \beta x + \varepsilon
+      \end{equation*}
+      \begin{itemize}
+        \item Equations fit neatly between columns
+        \item Use spacing to separate content
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \textbf{Right column}
+      \begin{itemize}
+        \item Tables, figures, or notes pair well here
+        \item The `[T]` option aligns column tops
+      \end{itemize}
+
+      \begin{tabular*}{\linewidth}{@{\extracolsep\fill}lc}
+        \toprule
+        Case & Value\\
+        \midrule
+        A & 1.2\\
+        B & 3.4\\
+        C & 5.6\\
+        \bottomrule
+      \end{tabular*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
   \frametitle{Slide with math}
   \begin{itemize}
     \item Roman letters: $G[p + P^7-Q] - A_B + L\{j\} = F(X) \times Z_f/H \cdot (g_4 - i)$
@@ -183,6 +237,18 @@ for signal in data:
         \int_{0}^{\infty}e^{-\delta t} \ln(c_{j}(t))+ \mathcal{U}(b_{j}(t) - \mathcal{B}(t))- \frac{\zeta}{4} h_{j}(t) -\frac{\gamma \cdot \pi_{j}(t)^2}{8}\,dt
       \end{equation*}
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dense slide with single spacing}
+  \begin{singlespace}
+    \begin{itemize}
+      \item The template uses generous spacing by default to encourage sparse research-seminar slides.
+      \item For dense derivations, identification arguments, or robustness summaries, wrap only that frame's content in \texttt{singlespace}.
+      \item Keep this exception local: switching one dense slide to single spacing should not change the deck-wide style.
+      \item Example: $Y_{it}=\alpha_i+\lambda_t+\beta D_{it}+X_{it}'\gamma+\varepsilon_{it}$ with clustered standard errors and pre-specified controls.
+    \end{itemize}
+  \end{singlespace}
 \end{frame}
 
 \begin{frame}
@@ -242,12 +308,14 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Basic figure}
+  \centering
   \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=4]{\pdf}%
 \end{frame}
 
 \begin{frame}
   \frametitle{Basic figure with caption and note}
   \begin{figure}
+    \centering
     \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.70\textheight,page=4]{\pdf}%
     \caption{Unemployment rate and job openings rate}
     \figurenote{Period: January 2001--March 2022. Source: BLS data from the CPS and JOLTS.}
@@ -256,6 +324,7 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Collection of figures (one figure per click)}
+  \centering
   \includegraphics<1>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=1]{\pdf}%
   \includegraphics<2>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=2]{\pdf}%
   \includegraphics<3>[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.75\textheight,page=3]{\pdf}%
@@ -356,7 +425,7 @@ for signal in data:
 \end{frame}
 
 \begin{frame}
-  \frametitle{Slide with corrolary}
+  \frametitle{Slide with corollary}
   \begin{corollary}[Implication in a simple yet common case]
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua:
     \begin{equation*}
@@ -498,6 +567,12 @@ for signal in data:
     Shock B           & 10.0 & 43.7 & 26 & 0.9488 \\
     \textbf{Mean}     & 10.0 & \textbf{35.2} & \textbf{18.1} & \textbf{0.9807} \\
   \end{xtabular*}
+\end{frame}
+
+\begin{frame}[allowframebreaks=0.8]
+  \frametitle{References}
+  \footnotesize
+  \printbibliography[heading=none]
 \end{frame}
 
 \lastslide
