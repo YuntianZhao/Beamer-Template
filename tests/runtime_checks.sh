@@ -59,9 +59,29 @@ assert_absent() {
   fi
 }
 
-compile_fixture() {
+assert_clean_log() {
+  local log="$1"
+  local message="$2"
+  local pattern='Overfull \\[hv]box|LaTeX Font Warning|Package biblatex Warning: Conflicting options|There were undefined references|Please rerun LaTeX|Please \(re\)run Biber|Missing character'
+  local status
+
+  if rg --quiet -- "$pattern" "$log"; then
+    printf 'FAIL: %s\n' "$message" >&2
+    rg -- "$pattern" "$log" >&2
+    exit 1
+  else
+    status=$?
+    if [ "$status" -ne 1 ]; then
+      printf 'FAIL: unable to inspect %s for warnings.\n' "$log" >&2
+      exit 1
+    fi
+  fi
+}
+
+compile_source() {
   local name="$1"
   local engine="$2"
+  local source="$3"
   local engine_flag
   local output_dir="$BUILD_ROOT/$name"
 
@@ -77,7 +97,13 @@ compile_fixture() {
 
   mkdir -p "$output_dir"
   latexmk -g "$engine_flag" -interaction=nonstopmode -halt-on-error \
-    -jobname="$name" -outdir="$output_dir" "tests/fixtures/$name.tex"
+    -jobname="$name" -outdir="$output_dir" "$source"
+}
+
+compile_fixture() {
+  local name="$1"
+  local engine="$2"
+  compile_source "$name" "$engine" "tests/fixtures/$name.tex"
 }
 
 check_dark() {
@@ -136,17 +162,30 @@ check_url() {
   compile_fixture url-fragment lualatex
 }
 
+check_sample() {
+  compile_source presentation-default lualatex presentation.tex
+  assert_clean_log "$BUILD_ROOT/presentation-default/presentation-default.log" 'default LuaLaTeX sample should be warning-clean'
+
+  compile_source presentation-default-pdf pdflatex presentation.tex
+  assert_clean_log "$BUILD_ROOT/presentation-default-pdf/presentation-default-pdf.log" 'default pdfLaTeX sample should be warning-clean'
+
+  compile_source presentation-12pt-169 lualatex tests/fixtures/presentation-12pt-169.tex
+  assert_clean_log "$BUILD_ROOT/presentation-12pt-169/presentation-12pt-169.log" '12pt 16:9 sample should be warning-clean'
+}
+
 case "$FILTER" in
   all)
     check_dark
     check_pdflatex
     check_fields
     check_url
+    check_sample
     ;;
   dark) check_dark ;;
   pdflatex) check_pdflatex ;;
   fields) check_fields ;;
   url) check_url ;;
+  sample) check_sample ;;
   *)
     printf 'ERROR: unknown runtime check %s.\n' "$FILTER" >&2
     exit 1

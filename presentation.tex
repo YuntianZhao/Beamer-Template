@@ -98,20 +98,22 @@
 
 \begin{frame}
   \frametitle{Slide with alerts}
-  Lorem ipsum dolor sit amet:
-  \begin{itemize}
-    \item Here is a standard alert: \alert{important text}
-    \item Here is structured text: \structure{important structure}
-    \item Here is a basic alert on the second click: \textcolor<2>{GitHubBlue}{important text}
-    \item Here is a positive alert on the third click: \textcolor<3>{GitHubGreen}{important text}
-    \item Here are various alerts to flag the sign of numbers on the second and third clicks:
-      \begin{itemize}
-        \item Positive number: \textcolor<2-3>{GitHubGreen}{+5}
-        \item Negative number: \textcolor<2>{GitHubRed}{-10}
-        \item Zero number: \textcolor<3>{GitHubBlue}{0.0}
-      \end{itemize}
-    \item Overlay syntax: \texttt{<2>} applies the color on the second click, while \texttt{<2-3>} applies it on the second and third clicks
-  \end{itemize}
+  \begin{singlespace}
+    Lorem ipsum dolor sit amet:
+    \begin{itemize}
+      \item Here is a standard alert: \alert{important text}
+      \item Here is structured text: \structure{important structure}
+      \item Here is a basic alert on the second click: \textcolor<2>{GitHubBlue}{important text}
+      \item Here is a positive alert on the third click: \textcolor<3>{GitHubGreen}{important text}
+      \item Here are various alerts to flag the sign of numbers on the second and third clicks:
+        \begin{itemize}
+          \item Positive number: \textcolor<2-3>{GitHubGreen}{+5}
+          \item Negative number: \textcolor<2>{GitHubRed}{-10}
+          \item Zero number: \textcolor<3>{GitHubBlue}{0.0}
+        \end{itemize}
+      \item Overlay syntax: \texttt{<2>} applies the color on the second click, while \texttt{<2-3>} applies it on the second and third clicks
+    \end{itemize}
+  \end{singlespace}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -169,6 +171,7 @@ for signal in data:
       \end{itemize}
     \end{column}
     \begin{column}{0.47\textwidth}
+      \small
       \begin{equation*}
         V(x)=\max_{x'}\left\{F(x, x') +\beta V(x')\right\}
       \end{equation*}
@@ -183,6 +186,8 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Three-column layout}
+  \small
+  \singlespacing
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.31\textwidth}
       \textbf{Left column}
@@ -258,7 +263,7 @@ for signal in data:
         \item a variant for theta: \texttt{\textbackslash vartheta} gives $\vartheta \neq \theta$
         \item a variant for epsilon: \texttt{\textbackslash varepsilon} gives $\varepsilon \neq \epsilon$
         \item a variant for pi: \texttt{\textbackslash varpi} gives $\varpi \neq \pi$
-        \item a variant for phi: \texttt{\textbackslash varpsi} gives $\varphi \neq \phi$
+        \item a variant for phi: \texttt{\textbackslash varphi} gives $\varphi \neq \phi$
         \item a variant for sigma: \texttt{\textbackslash varsigma} gives $\varsigma \neq \sigma$
         \item a variant for rho: \texttt{\textbackslash varrho} gives $\varrho \neq \rho$
         \item a variant for kappa: \texttt{\textbackslash varkappa} gives $\varkappa \neq \kappa$
@@ -287,8 +292,8 @@ for signal in data:
     \midrule
     Normal & $a\ b\ c\ x\ y\ z$ & $A\ B\ C\ X\ Y\ Z$\\
     Bold & $\bm{a}\ \bm{b}\ \bm{c}\ \bm{x}\ \bm{y}\ \bm{z}$ & $\bm{A}\ \bm{B}\ \bm{C}\ \bm{X}\ \bm{Y}\ \bm{Z}$\\
-    Cal & $\mathcal{a}\ \mathcal{b}\ \mathcal{c}\ \mathcal{x}\ \mathcal{y}\ \mathcal{z}$ & $\mathcal{A}\ \mathcal{B}\ \mathcal{C}\ \mathcal{X}\ \mathcal{Y}\ \mathcal{Z}$\\
-    Bold cal & $\mathbcal{a}\ \mathbcal{b}\ \mathbcal{c}\ \mathbcal{x}\ \mathbcal{y}\ \mathbcal{z}$ & $\mathbcal{A}\ \mathbcal{B}\ \mathbcal{C}\ \mathbcal{X}\ \mathbcal{Y}\ \mathbcal{Z}$\\
+    Cal & $\mathcal{a}\ \mathcal{b}\ \mathcal{c}\ \mathcal{z}$ & $\mathcal{A}\ \mathcal{B}\ \mathcal{C}\ \mathcal{X}\ \mathcal{Y}\ \mathcal{Z}$\\
+    Bold cal & $\mathbcal{a}\ \mathbcal{b}\ \mathbcal{c}\ \mathbcal{z}$ & $\mathbcal{A}\ \mathbcal{B}\ \mathbcal{C}\ \mathbcal{X}\ \mathbcal{Y}\ \mathbcal{Z}$\\
     Scr & $\mathscr{a}\ \mathscr{b}\ \mathscr{c}\ \mathscr{x}\ \mathscr{y}\ \mathscr{z}$ & $\mathscr{A}\ \mathscr{B}\ \mathscr{C}\ \mathscr{X}\ \mathscr{Y}\ \mathscr{Z}$\\
     Bold scr & $\mathbscr{a}\ \mathbscr{b}\ \mathbscr{c}\ \mathbscr{x}\ \mathbscr{y}\ \mathbscr{z}$ & $\mathbscr{A}\ \mathbscr{B}\ \mathbscr{C}\ \mathbscr{X}\ \mathbscr{Y}\ \mathbscr{Z}$\\
     Frak & $\mathfrak{a}\ \mathfrak{b}\ \mathfrak{c}\ \mathfrak{x}\ \mathfrak{y}\ \mathfrak{z}$ & $\mathfrak{A}\ \mathfrak{B}\ \mathfrak{C}\ \mathfrak{X}\ \mathfrak{Y}\ \mathfrak{Z}$\\
@@ -314,7 +319,7 @@ for signal in data:
   \frametitle{Basic figure with caption and note}
   \begin{figure}
     \centering
-    \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.70\textheight,page=4]{\pdf}%
+    \includegraphics[min width=.32\textwidth,min height=.25\textwidth,max width=.96\textwidth,max height=.62\textheight,page=4]{\pdf}%
     \caption{Unemployment rate and job openings rate}
     \figurenote{Period: January 2001--March 2022. Source: BLS data from the CPS and JOLTS.}
   \end{figure}
@@ -354,27 +359,28 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Basic table with note}
-  \begin{table}
-    \begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccc}
-      \toprule
-      & Column 1 & Column 2 & Column 3 & Column 4\\
-      \midrule
-      Line 1 & A & $\mathcal{B}$ & C  & C \\
-      Line 2 & D & E & F & \textcolor<2>{GitHubGreen}{$\Lambda$} \\
-      Line 3 & \textcolor<1>{GitHubRed}{$\mathbb{G}$} & H & I & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
-      \midrule
-      Line 4 & J & K & L & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
-      Line 5 & M & N & O & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
-      \midrule
-      Line 6 & \textcolor<1>{GitHubRed}{B} & \textcolor<1>{GitHubRed}{$\mathcal{K}$} & L & C \\
-      Line 7 & M & N & -- & \textcolor<1>{GitHubRed}{$\mathcal{K}$} \\
-      \bottomrule
-    \end{tabular*}
-    \caption{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua---sunt in culpa qui officia deserunt mollit anim id.}
-  \end{table}
-
-  Something here.
+  \footnotesize
+  \begin{singlespace}
+    \begin{table}
+      \begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccc}
+        \toprule
+        & Column 1 & Column 2 & Column 3 & Column 4\\
+        \midrule
+        Line 1 & A & $\mathcal{B}$ & C  & C \\
+        Line 2 & D & E & F & \textcolor<2>{GitHubGreen}{$\Lambda$} \\
+        Line 3 & \textcolor<1>{GitHubRed}{$\mathbb{G}$} & H & I & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
+        \midrule
+        Line 4 & J & K & L & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
+        Line 5 & M & N & O & \textcolor<2>{GitHubGreen}{$\mathcal{C}$} \\
+        \midrule
+        Line 6 & \textcolor<1>{GitHubRed}{B} & \textcolor<1>{GitHubRed}{$\mathcal{K}$} & L & C \\
+        Line 7 & M & N & -- & \textcolor<1>{GitHubRed}{$\mathcal{K}$} \\
+        \bottomrule
+      \end{tabular*}
+      \caption{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua---sunt in culpa qui officia deserunt mollit anim id.}
+    \end{table}
+  \end{singlespace}
 \end{frame}
 
 \begin{frame}
@@ -408,6 +414,7 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Slide with proposition}
+  \singlespacing
   \begin{itemize}
     \item Quia dolor sit amet consectetur adipiscing velit
     \item Sed quia non numquam eius modi tempora incidunt
@@ -424,18 +431,20 @@ for signal in data:
 
 \begin{frame}
   \frametitle{Slide with corollary}
-  \begin{corollary}[Implication in a simple yet common case]
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua:
-    \begin{equation*}
-      \mathbb{E}(N(z^*)) \approx \frac{1-\mathbb{P}(\alpha\pi)}{1-\pi}- \frac{f(y)}{z(p)^*} + P(\Gamma).
-    \end{equation*}
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  \end{corollary}
-  \begin{itemize}
-    \item Donec commodo justo a eros malesuada
-    \item Eget vulputate tortor accumsan,
-    \item Vulputate metus eu, finibus nunc: $\ln(y) - \sum j^2 \to x(l)$
-  \end{itemize}
+  \begin{singlespace}
+    \begin{corollary}[Implication in a simple yet common case]
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua:
+      \begin{equation*}
+        \mathbb{E}(N(z^*)) \approx \frac{1-\mathbb{P}(\alpha\pi)}{1-\pi}- \frac{f(y)}{z(p)^*} + P(\Gamma).
+      \end{equation*}
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    \end{corollary}
+    \begin{itemize}
+      \item Donec commodo justo a eros malesuada
+      \item Eget vulputate tortor accumsan,
+      \item Vulputate metus eu, finibus nunc: $\ln(y) - \sum j^2 \to x(l)$
+    \end{itemize}
+  \end{singlespace}
 \end{frame}
 
 \begin{frame}
