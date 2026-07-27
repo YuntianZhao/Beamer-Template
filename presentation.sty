@@ -116,18 +116,26 @@
 
 % Set title font
 \setbeamerfont{title}{size=\huge, shape=\scshape}
+\setbeamerfont{subtitle}{size=\large}
 
 % Set author font
 \setbeamerfont{author}{size=\large}
+\setbeamerfont{institute}{size=\normalsize}
 
 % Set date font
 \setbeamerfont{date}{size=\large}
 
 % Set frame title font
 \setbeamerfont{frametitle}{shape=\scshape}
+\setbeamerfont{framesubtitle}{size=\small}
 
 % Keep user-written capitalization in frame titles.
-\setbeamertemplate{frametitle}{\vskip3mm\insertframetitle}
+\setbeamertemplate{frametitle}{%
+  \vskip3mm%
+  \insertframetitle\par%
+  \ifx\insertframesubtitle\@empty\else%
+    {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle\par}%
+  \fi}
 
 % Format continuation count for multipage slides
 \setbeamertemplate{frametitle continuation}{[\insertcontinuationcount]}
@@ -188,6 +196,10 @@
 
 % Set title color
 \setbeamercolor{title}{fg=GitHubFg}
+\setbeamercolor{subtitle}{fg=GitHubMuted}
+\setbeamercolor{institute}{fg=GitHubMuted}
+\setbeamercolor{framesubtitle}{fg=GitHubMuted}
+\setbeamercolor{titlegraphic}{fg=GitHubFg}
 
 % Set frame title color
 \setbeamercolor{frametitle}{fg=GitHubFg}
@@ -222,18 +234,37 @@
 \usepackage{etoolbox}
 
 % Define commands to insert slide URL
-\newcommand*{\inserturl}{} % Stored URL (empty by default)
-\newcommand*{\paperurl}[1]{\renewcommand*{\inserturl}{#1}} % URL defined in preamble
+\newif\ifpresentationurlset
+\newtoks\presentationurltoks
+\newcommand*{\inserturl}{\the\presentationurltoks}
+\newcommand*{\paperurl}[1]{%
+  \global\presentationurltoks={#1}%
+  \global\presentationurlsettrue}
 
 \setbeamertemplate{title page}{%
   {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}%
+  \ifx\insertsubtitle\@empty\else%
+    \vspace{2mm}%
+    {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}%
+  \fi%
   {\color{GitHubFg}\rule{\textwidth}{1.5pt}\par}%
   \vspace{1.5cm}%
   {\usebeamerfont{author}\insertauthor\par}%
+  \ifx\insertinstitute\@empty\else%
+    \vspace{2mm}%
+    {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute\par}%
+  \fi%
   \vspace{5mm}%
   {\usebeamerfont{date}\insertdate\par}%
-  \ifdefempty{\inserturl}{}{\vspace{5mm}{\color{GitHubMuted}\footnotesize Available at \url{\inserturl}\par}}%
-\vfill}
+  \ifpresentationurlset%
+    \vspace{5mm}%
+    {\color{GitHubMuted}\footnotesize Available at \url{\inserturl}\par}%
+  \fi%
+  \ifx\inserttitlegraphic\@empty\else%
+    \vspace{5mm}%
+    {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}%
+  \fi%
+  \vfill}
 
 % ---- Format lists ----
 

@@ -12,7 +12,7 @@ trap cleanup EXIT
 
 cd "$ROOT_DIR"
 
-for command_name in latexmk biber pdffonts pdftohtml rg; do
+for command_name in latexmk biber pdffonts pdftohtml pdfinfo pdftotext rg; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     printf 'ERROR: %s is required by tests/runtime_checks.sh.\n' "$command_name" >&2
     exit 1
@@ -25,6 +25,17 @@ assert_present() {
   local message="$3"
 
   if ! rg --fixed-strings --quiet -- "$pattern" "$file"; then
+    printf 'FAIL: %s\n' "$message" >&2
+    exit 1
+  fi
+}
+
+assert_regex() {
+  local pattern="$1"
+  local file="$2"
+  local message="$3"
+
+  if ! rg --quiet -- "$pattern" "$file"; then
     printf 'FAIL: %s\n' "$message" >&2
     exit 1
   fi
@@ -104,13 +115,38 @@ check_pdflatex() {
   assert_present 'LibertinusSans-Italic' "$fonts" 'bold-italic fallback should preserve italic emphasis'
 }
 
+check_fields() {
+  local name=beamer-fields
+  local output_dir="$BUILD_ROOT/$name"
+  local text="$output_dir/$name.txt"
+  local info="$output_dir/$name.info"
+
+  compile_fixture "$name" lualatex
+  pdftotext "$output_dir/$name.pdf" "$text"
+  pdfinfo "$output_dir/$name.pdf" > "$info"
+  assert_present 'Metadata Subtitle' "$text" 'title subtitle should render'
+  assert_present 'Institute Probe' "$text" 'institute should render'
+  assert_present 'Title Graphic Probe' "$text" 'title graphic should render'
+  assert_present 'Frame Subtitle Probe' "$text" 'frame subtitle should render'
+  assert_regex '^Title:[[:space:]]+Metadata Title - Metadata Subtitle$' "$info" 'PDF title should follow title and subtitle'
+  assert_regex '^Author:[[:space:]]+Metadata Author$' "$info" 'PDF author should follow the Beamer author'
+}
+
+check_url() {
+  compile_fixture url-fragment lualatex
+}
+
 case "$FILTER" in
   all)
     check_dark
     check_pdflatex
+    check_fields
+    check_url
     ;;
   dark) check_dark ;;
   pdflatex) check_pdflatex ;;
+  fields) check_fields ;;
+  url) check_url ;;
   *)
     printf 'ERROR: unknown runtime check %s.\n' "$FILTER" >&2
     exit 1

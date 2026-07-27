@@ -1,14 +1,11 @@
 \providecommand{\presentationaspectratio}{43}
 \providecommand{\presentationmode}{light}
 \providecommand{\presentationfontsize}{12pt}
-\edef\presentationclassoptions{\presentationfontsize,aspectratio=\presentationaspectratio,xcolor={dvipsnames},usepdftitle=false}
+\edef\presentationclassoptions{\presentationfontsize,aspectratio=\presentationaspectratio,xcolor={dvipsnames}}
 \expandafter\documentclass\expandafter[\presentationclassoptions]{beamer}
 \edef\presentationpackageoptions{\presentationmode,pagenumbers}
 \expandafter\usepackage\expandafter[\presentationpackageoptions]{presentation}
-\hypersetup{pdfpagemode=UseNone, hidelinks, pdfdisplaydoctitle=true,%
-  %
-  % Enter presentation title to populate PDF metadata:
-pdftitle={Minimalist LaTeX Template for Academic Presentations}}
+\hypersetup{pdfpagemode=UseNone, hidelinks, pdfdisplaydoctitle=true}
 
 % Enter path to PDF file with figures:
 \newcommand{\pdf}{figures.pdf}
