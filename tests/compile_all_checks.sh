@@ -63,6 +63,48 @@ sleep "${FAKE_SLEEP:-0}"
 FAKE_LATEXMK
 chmod +x "$FAKE_BIN/latexmk"
 
+export FAKE_REAL_MV
+FAKE_REAL_MV=$(command -v mv)
+cat > "$FAKE_BIN/mv" <<'FAKE_MV'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -n "${FAKE_FAIL_PUBLISH:-}" ]; then
+  case "${1##*/}:${2:-}" in
+    .test.*:*/output/test) exit 43 ;;
+  esac
+fi
+if [ -n "${FAKE_INTERRUPT_PUBLISH:-}" ]; then
+  case "${1##*/}:${2:-}" in
+    .test.*:*/output/test)
+      kill -TERM "$PPID"
+      exit 143
+      ;;
+  esac
+fi
+
+exec "$FAKE_REAL_MV" "$@"
+FAKE_MV
+chmod +x "$FAKE_BIN/mv"
+
+export FAKE_REAL_RM
+FAKE_REAL_RM=$(command -v rm)
+cat > "$FAKE_BIN/rm" <<'FAKE_RM'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -n "${FAKE_FAIL_BUILD_CLEANUP:-}" ]; then
+  for argument in "$@"; do
+    case "${argument##*/}" in
+      .build-presentation-variants.*) exit 44 ;;
+    esac
+  done
+fi
+
+exec "$FAKE_REAL_RM" "$@"
+FAKE_RM
+chmod +x "$FAKE_BIN/rm"
+
 export PATH="$FAKE_BIN:$PATH"
 export FAKE_COUNT_FILE="$TEST_ROOT/count"
 
@@ -101,6 +143,62 @@ if compgen -G "$TEST_REPO/output/test/presentation_*.pdf" >/dev/null; then
 fi
 
 rm -f "$FAKE_COUNT_FILE"
+export FAKE_FAIL_PUBLISH=1
+if "$TEST_REPO/compile_all.sh"; then
+  printf 'FAIL: an injected publication failure should fail compile_all.sh\n' >&2
+  exit 1
+fi
+unset FAKE_FAIL_PUBLISH
+
+if [ ! -f "$TEST_REPO/output/test/sentinel.pdf" ]; then
+  printf 'FAIL: a publication failure should restore the previous output directory\n' >&2
+  exit 1
+fi
+if compgen -G "$TEST_REPO/output/test/presentation_*.pdf" >/dev/null; then
+  printf 'FAIL: a publication failure should not expose the staged matrix\n' >&2
+  exit 1
+fi
+
+rm -f "$FAKE_COUNT_FILE"
+export FAKE_INTERRUPT_PUBLISH=1
+if "$TEST_REPO/compile_all.sh"; then
+  printf 'FAIL: an interrupted publication should fail compile_all.sh\n' >&2
+  exit 1
+fi
+unset FAKE_INTERRUPT_PUBLISH
+
+if [ ! -f "$TEST_REPO/output/test/sentinel.pdf" ]; then
+  printf 'FAIL: an interrupted publication should restore the previous output directory\n' >&2
+  exit 1
+fi
+if compgen -G "$TEST_REPO/output/test/presentation_*.pdf" >/dev/null; then
+  printf 'FAIL: an interrupted publication should not expose the staged matrix\n' >&2
+  exit 1
+fi
+
+rm -f "$FAKE_COUNT_FILE"
+export FAKE_FAIL_AT=2
+export FAKE_FAIL_BUILD_CLEANUP=1
+if "$TEST_REPO/compile_all.sh"; then
+  printf 'FAIL: an injected build and cleanup failure should fail compile_all.sh\n' >&2
+  exit 1
+fi
+unset FAKE_FAIL_AT
+unset FAKE_FAIL_BUILD_CLEANUP
+
+if [ -d "$TEST_REPO/.build-presentation-variants.lock" ]; then
+  "$FAKE_REAL_RM" -rf \
+    "$TEST_REPO/.build-presentation-variants.lock" \
+    "$TEST_REPO"/.build-presentation-variants.* \
+    "$TEST_REPO"/output/.test.*
+  printf 'FAIL: cleanup failure should not prevent lock release\n' >&2
+  exit 1
+fi
+"$FAKE_REAL_RM" -rf \
+  "$TEST_REPO"/.build-presentation-variants.* \
+  "$TEST_REPO"/output/.test.*
+
+rm -f "$FAKE_COUNT_FILE"
 "$TEST_REPO/compile_all.sh"
 set -- "$TEST_REPO"/output/test/presentation_*.pdf
 if [ "$#" -ne 12 ]; then
@@ -117,11 +215,11 @@ export FAKE_SLEEP=0.2
 "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/first.log" 2>&1 &
 FIRST_PID=$!
 for _ in 1 2 3 4 5 6 7 8 9 10; do
-  [ -d "$TEST_REPO/.build-presentation-variants.lock" ] && break
+  [ -f "$TEST_REPO/.build-presentation-variants.lock/owner" ] && break
   sleep 0.05
 done
-if [ ! -d "$TEST_REPO/.build-presentation-variants.lock" ]; then
-  printf 'FAIL: compile_all.sh should create a single-run lock\n' >&2
+if [ ! -f "$TEST_REPO/.build-presentation-variants.lock/owner" ]; then
+  printf 'FAIL: compile_all.sh should record single-run lock ownership\n' >&2
   exit 1
 fi
 if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/second.log" 2>&1; then
@@ -134,5 +232,54 @@ if ! rg --fixed-strings --quiet 'another compile_all.sh run is active' "$TEST_RO
 fi
 wait "$FIRST_PID"
 FIRST_PID=
+
+mkdir "$TEST_REPO/.build-presentation-variants.lock"
+printf '99999999\n' > "$TEST_REPO/.build-presentation-variants.lock/owner"
+if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/stale-lock.log" 2>&1; then
+  printf 'FAIL: a stale compile_all.sh lock should fail safely\n' >&2
+  exit 1
+fi
+if ! rg --fixed-strings --quiet 'stale compile_all.sh lock' "$TEST_ROOT/stale-lock.log" ||
+   ! rg --fixed-strings --quiet 'remove it and rerun' "$TEST_ROOT/stale-lock.log"; then
+  printf 'FAIL: stale-lock failure should identify safe recovery\n' >&2
+  exit 1
+fi
+if [ ! -d "$TEST_REPO/.build-presentation-variants.lock" ]; then
+  printf 'FAIL: stale-lock diagnosis should not delete the existing lock\n' >&2
+  exit 1
+fi
+"$FAKE_REAL_RM" -rf "$TEST_REPO/.build-presentation-variants.lock"
+
+mkdir "$TEST_REPO/.build-presentation-variants.lock"
+printf 'not-a-pid\n' > "$TEST_REPO/.build-presentation-variants.lock/owner"
+if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/malformed-lock.log" 2>&1; then
+  printf 'FAIL: a malformed compile_all.sh lock should fail safely\n' >&2
+  exit 1
+fi
+if ! rg --fixed-strings --quiet 'malformed compile_all.sh lock' "$TEST_ROOT/malformed-lock.log" ||
+   ! rg --fixed-strings --quiet 'after confirming no build is active' "$TEST_ROOT/malformed-lock.log"; then
+  printf 'FAIL: malformed-lock failure should require safe manual recovery\n' >&2
+  exit 1
+fi
+if [ ! -d "$TEST_REPO/.build-presentation-variants.lock" ]; then
+  printf 'FAIL: malformed-lock diagnosis should not delete the existing lock\n' >&2
+  exit 1
+fi
+"$FAKE_REAL_RM" -rf "$TEST_REPO/.build-presentation-variants.lock"
+
+printf 'not a lock directory\n' > "$TEST_REPO/.build-presentation-variants.lock"
+if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/invalid-lock-path.log" 2>&1; then
+  printf 'FAIL: a non-directory lock path should fail safely\n' >&2
+  exit 1
+fi
+if ! rg --fixed-strings --quiet 'lock path exists and is not a directory' "$TEST_ROOT/invalid-lock-path.log"; then
+  printf 'FAIL: non-directory lock failure should identify the acquisition error\n' >&2
+  exit 1
+fi
+if [ ! -f "$TEST_REPO/.build-presentation-variants.lock" ]; then
+  printf 'FAIL: non-directory lock diagnosis should not delete the existing path\n' >&2
+  exit 1
+fi
+"$FAKE_REAL_RM" -f "$TEST_REPO/.build-presentation-variants.lock"
 
 printf 'compile_all.sh checks passed.\n'
