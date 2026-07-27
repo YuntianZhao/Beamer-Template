@@ -66,3 +66,9 @@ Also run the all-variant build script when changes affect presentation options, 
 Treat failures in any engine or variant as compatibility regressions to fix before completion.
 
 Generated PDFs and temporary build directories are ignored by git. Never edit generated PDFs manually; update the source and regenerate.
+
+## Releases
+
+Follow `RELEASING.md` for the required runtime files, compatibility matrix, and
+GitHub release procedure. Never tag, push, or create a release without explicit
+user approval.

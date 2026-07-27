@@ -115,4 +115,13 @@ check_present '## License' README.md 'README should explain template licensing'
 check_present 'presentation.sty' README.md 'README license section should name the runtime work'
 check_present 'presentation-minimal.tex' README.md 'README license section should name the runtime work'
 
+check_present 'presentation.sty' RELEASING.md 'release instructions should list presentation.sty'
+check_present 'presentation-minimal.tex' RELEASING.md 'release instructions should list presentation-minimal.tex'
+check_present 'LICENSE.txt' RELEASING.md 'release instructions should list LICENSE.txt'
+check_present 'bash tests/template_checks.sh' RELEASING.md 'release instructions should require textual checks'
+check_present './compile_all.sh' RELEASING.md 'release instructions should require the variant matrix'
+check_present 'latexmk -pdf' RELEASING.md 'release instructions should require pdfLaTeX verification'
+check_present 'gh release create' RELEASING.md 'release instructions should document GitHub release creation'
+check_present 'RELEASING.md' AGENTS.md 'agent instructions should point to the release checklist'
+
 exit "$fail"
