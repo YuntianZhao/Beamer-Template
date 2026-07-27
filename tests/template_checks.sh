@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT_DIR"
+
+if ! command -v rg >/dev/null 2>&1; then
+  printf 'ERROR: rg is required by tests/template_checks.sh.\n' >&2
+  exit 1
+fi
+
 fail=0
 
 check_absent() {
   local pattern="$1"
   local file="$2"
   local message="$3"
+  local status
 
   if rg --fixed-strings --quiet -- "$pattern" "$file"; then
     printf 'FAIL: %s\n' "$message" >&2
     fail=1
+  else
+    status=$?
+    if [ "$status" -ne 1 ]; then
+      printf 'FAIL: unable to inspect %s for: %s\n' "$file" "$message" >&2
+      fail=1
+    fi
   fi
 }
 
@@ -18,21 +33,37 @@ check_present() {
   local pattern="$1"
   local file="$2"
   local message="$3"
+  local status
 
-  if ! rg --fixed-strings --quiet -- "$pattern" "$file"; then
-    printf 'FAIL: %s\n' "$message" >&2
-    fail=1
+  if rg --fixed-strings --quiet -- "$pattern" "$file"; then
+    return
+  else
+    status=$?
   fi
+
+  if [ "$status" -eq 1 ]; then
+    printf 'FAIL: %s\n' "$message" >&2
+  else
+    printf 'FAIL: unable to inspect %s for: %s\n' "$file" "$message" >&2
+  fi
+  fail=1
 }
 
 check_absent_regex() {
   local pattern="$1"
   local file="$2"
   local message="$3"
+  local status
 
   if rg --quiet -- "$pattern" "$file"; then
     printf 'FAIL: %s\n' "$message" >&2
     fail=1
+  else
+    status=$?
+    if [ "$status" -ne 1 ]; then
+      printf 'FAIL: unable to inspect %s for: %s\n' "$file" "$message" >&2
+      fail=1
+    fi
   fi
 }
 

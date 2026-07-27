@@ -18,7 +18,7 @@
 # Temporary LaTeX directories
 _minted-*/
 auto/
-.build-presentation-variants/
+.build-presentation-variants*
 .engine-check/
 .worktrees/
 

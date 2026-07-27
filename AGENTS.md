@@ -51,6 +51,15 @@ latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=.engine-check/x
 
 Do not replace these with single `lualatex`, `pdflatex`, or `xelatex` calls; single engine passes do not resolve `biblatex`/`biber` output or cross-reference reruns.
 
+Run the focused runtime and transactional build checks:
+
+```sh
+bash tests/runtime_checks.sh
+bash tests/compile_all_checks.sh
+```
+
+The focused runtime checks require Poppler tools (`pdfinfo`, `pdftotext`, `pdftohtml`, and `pdffonts`) in addition to the TeX, Biber, and ripgrep tools.
+
 Run the textual regression checks after documentation, build-script, or template changes:
 
 ```sh
