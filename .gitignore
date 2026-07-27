@@ -20,6 +20,7 @@ _minted-*/
 auto/
 .build-presentation-variants/
 .engine-check/
+.worktrees/
 
 # AI generated plans
 docs/superpowers/*
