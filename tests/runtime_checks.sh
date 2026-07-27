@@ -12,7 +12,7 @@ trap cleanup EXIT
 
 cd "$ROOT_DIR"
 
-for command_name in latexmk biber pdftohtml rg; do
+for command_name in latexmk biber pdffonts pdftohtml rg; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     printf 'ERROR: %s is required by tests/runtime_checks.sh.\n' "$command_name" >&2
     exit 1
@@ -90,8 +90,27 @@ check_dark() {
   assert_present 'color="#3fb950"' "$xml" 'dark example text should use GitHubGreen'
 }
 
+check_pdflatex() {
+  local name=pdflatex-compatibility
+  local output_dir="$BUILD_ROOT/$name"
+  local log="$output_dir/$name.log"
+  local fonts="$output_dir/$name.fonts"
+
+  compile_fixture "$name" pdflatex
+  pdffonts "$output_dir/$name.pdf" > "$fonts"
+  assert_absent 'Missing = inserted for \ifnum' "$log" 'multi-token calligraphic math should compile under pdfLaTeX'
+  assert_absent 'LaTeX Font Warning: Font shape `T1/LibertinusSans-TLF/b/it' "$log" 'pdfLaTeX should use an explicit italic-preserving fallback'
+  assert_absent 'Some font shapes were not available' "$log" 'pdfLaTeX should not finish with font substitutions'
+  assert_present 'LibertinusSans-Italic' "$fonts" 'bold-italic fallback should preserve italic emphasis'
+}
+
 case "$FILTER" in
-  all|dark) check_dark ;;
+  all)
+    check_dark
+    check_pdflatex
+    ;;
+  dark) check_dark ;;
+  pdflatex) check_pdflatex ;;
   *)
     printf 'ERROR: unknown runtime check %s.\n' "$FILTER" >&2
     exit 1

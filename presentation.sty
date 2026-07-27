@@ -64,11 +64,10 @@
 \renewcommand{\sfdefault}{LibertinusSans-TLF}
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage[scale=.85]{sourcecodepro} % Monospace font
+\DeclareFontShape{T1}{LibertinusSans-TLF}{b}{it}{%
+  <-> ssub * LibertinusSans-TLF/m/it}{}
 \usepackage[cal=stixplain, scr=boondox, frak=euler]{mathalfa} % Lowercase and bold math alphabets
-\let\origmathcal\mathcal
-\renewcommand{\mathcal}[1]{\ifnum`#1>`Z \mathscr{#1}\else\origmathcal{#1}\fi}
-\renewcommand{\mathbcal}[1]{\ifnum`#1>`Z \mathbfscr{#1}\else\mbox{\boldmath$\origmathcal{#1}$}\fi}
-\newcommand{\mathbscr}[1]{\mathbfscr{#1}}
+\newcommand{\mathbscr}[1]{\boldsymbol{\mathscr{#1}}}
 \newcommand{\mathbfrak}[1]{\pmb{\mathfrak{#1}}}
 \newcommand{\hmmax}{0}
 \newcommand{\bmmax}{0}
