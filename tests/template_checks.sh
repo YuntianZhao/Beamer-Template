@@ -46,6 +46,9 @@ check_file_absent() {
   fi
 }
 
+check_present '\NeedsTeXFormat{LaTeX2e}' presentation.sty 'presentation.sty should declare its required LaTeX format'
+check_present '\ProvidesPackage{presentation}[2026/07/27 v1.1.0' presentation.sty 'presentation.sty should identify release v1.1.0'
+check_present 'giveninits=true,uniquename=mininit' presentation.sty 'Chicago initials should use an explicit compatible uniqueness policy'
 check_absent '\MakeLowercase' presentation.sty 'presentation.sty must not mutate title or heading text case'
 check_absent '\addbibresource{references.bib}' presentation.sty 'bibliography database belongs in presentation content, not style'
 check_absent '\renewcommand{\includegraphics}' presentation.sty 'presentation.sty must not globally redefine \includegraphics'
