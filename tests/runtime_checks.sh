@@ -59,6 +59,39 @@ assert_absent() {
   fi
 }
 
+assert_pdf_text_color() {
+  local text="$1"
+  local color_pattern="$2"
+  local xml="$3"
+  local message="$4"
+  local text_line
+  local font_id
+  local status
+
+  if text_line=$(rg --fixed-strings --max-count 1 -- "$text" "$xml"); then
+    :
+  else
+    status=$?
+    if [ "$status" -eq 1 ]; then
+      printf 'FAIL: %s (probe text not found)\n' "$message" >&2
+    else
+      printf 'FAIL: unable to inspect %s for: %s\n' "$xml" "$message" >&2
+    fi
+    exit 1
+  fi
+
+  font_id=${text_line#* font=\"}
+  if [ "$font_id" = "$text_line" ]; then
+    printf 'FAIL: %s (probe font not found)\n' "$message" >&2
+    exit 1
+  fi
+  font_id=${font_id%%\"*}
+  if ! rg --quiet -- "<fontspec id=\"$font_id\"[^>]*color=\"$color_pattern\"" "$xml"; then
+    printf 'FAIL: %s\n' "$message" >&2
+    exit 1
+  fi
+}
+
 assert_clean_log() {
   local log="$1"
   local message="$2"
@@ -114,17 +147,9 @@ check_dark() {
   compile_fixture "$name" lualatex
   pdftohtml -xml -stdout "$output_dir/$name.pdf" > "$xml"
   # Poppler 26.07.0 truncates selected RGB channels when serializing PDF colors.
-  if ! rg --fixed-strings --quiet \
-    -e 'color="#f85149"' -e 'color="#f85148"' -- "$xml"; then
-    printf 'FAIL: dark alerted text should use GitHubRed\n' >&2
-    exit 1
-  fi
-  if ! rg --fixed-strings --quiet \
-    -e 'color="#2f81f7"' -e 'color="#2e80f7"' -- "$xml"; then
-    printf 'FAIL: dark structure text should use GitHubBlue\n' >&2
-    exit 1
-  fi
-  assert_present 'color="#3fb950"' "$xml" 'dark example text should use GitHubGreen'
+  assert_pdf_text_color 'Alert probe.' '#(f85149|f85148)' "$xml" 'dark alert probe should use GitHubRed'
+  assert_pdf_text_color 'Structure probe.' '#(2f81f7|2e80f7)' "$xml" 'dark structure probe should use GitHubBlue'
+  assert_pdf_text_color 'Example probe.' '#3fb950' "$xml" 'dark example probe should use GitHubGreen'
 }
 
 check_pdflatex() {
@@ -159,7 +184,17 @@ check_fields() {
 }
 
 check_url() {
-  compile_fixture url-fragment lualatex
+  local name=url-fragment
+  local output_dir="$BUILD_ROOT/$name"
+  local text="$output_dir/$name.txt"
+  local xml="$output_dir/$name.xml"
+  local url='https://example.test/paper#section'
+
+  compile_fixture "$name" lualatex
+  pdftotext "$output_dir/$name.pdf" "$text"
+  pdftohtml -xml -stdout "$output_dir/$name.pdf" > "$xml"
+  assert_present "$url" "$text" 'rendered paper URL should retain its fragment'
+  assert_present "href=\"$url\"" "$xml" 'paper URL annotation should retain its fragment target'
 }
 
 check_sample() {

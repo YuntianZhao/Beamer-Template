@@ -5,6 +5,7 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TEST_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/compile-all-checks.XXXXXX")
 TEST_REPO="$TEST_ROOT/repo"
 FAKE_BIN="$TEST_ROOT/bin"
+FALLBACK_BIN="$TEST_ROOT/fallback-bin"
 
 if ! command -v rg >/dev/null 2>&1; then
   printf 'ERROR: rg is required by tests/compile_all_checks.sh.\n' >&2
@@ -14,12 +15,13 @@ fi
 cleanup() {
   if [ -n "${FIRST_PID:-}" ]; then
     kill "$FIRST_PID" >/dev/null 2>&1 || true
+    wait "$FIRST_PID" >/dev/null 2>&1 || true
   fi
   rm -rf "$TEST_ROOT"
 }
 trap cleanup EXIT
 
-mkdir -p "$TEST_REPO/output/test" "$FAKE_BIN"
+mkdir -p "$TEST_REPO/output/test" "$FAKE_BIN" "$FALLBACK_BIN"
 cp "$ROOT_DIR/compile_all.sh" "$TEST_REPO/compile_all.sh"
 chmod +x "$TEST_REPO/compile_all.sh"
 
@@ -54,7 +56,9 @@ fi
 
 mkdir -p "$outdir"
 printf 'fake pdf for %s\n' "$jobname" > "$outdir/$jobname.pdf"
-if [ -n "${FAKE_WARNING_AT:-}" ] && [ "$count" -eq "$FAKE_WARNING_AT" ]; then
+if [ -n "${FAKE_MISSING_LOG_AT:-}" ] && [ "$count" -eq "$FAKE_MISSING_LOG_AT" ]; then
+  :
+elif [ -n "${FAKE_WARNING_AT:-}" ] && [ "$count" -eq "$FAKE_WARNING_AT" ]; then
   printf 'Missing character: There is no x in font fake!\n' > "$outdir/$jobname.log"
 else
   : > "$outdir/$jobname.log"
@@ -62,6 +66,20 @@ fi
 sleep "${FAKE_SLEEP:-0}"
 FAKE_LATEXMK
 chmod +x "$FAKE_BIN/latexmk"
+
+export FAKE_REAL_GREP
+FAKE_REAL_GREP=$(command -v grep)
+cat > "$FAKE_BIN/grep" <<'FAKE_GREP'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -n "${FAKE_GREP_ERROR:-}" ]; then
+  exit 2
+fi
+
+exec "$FAKE_REAL_GREP" "$@"
+FAKE_GREP
+chmod +x "$FAKE_BIN/grep"
 
 export FAKE_REAL_MV
 FAKE_REAL_MV=$(command -v mv)
@@ -108,6 +126,10 @@ chmod +x "$FAKE_BIN/rm"
 export PATH="$FAKE_BIN:$PATH"
 export FAKE_COUNT_FILE="$TEST_ROOT/count"
 
+for command_name in bash cat cp dirname grep mkdir mktemp mv rm rmdir; do
+  ln -s "$(command -v "$command_name")" "$FALLBACK_BIN/$command_name"
+done
+
 printf 'previous complete output\n' > "$TEST_REPO/output/test/sentinel.pdf"
 export FAKE_FAIL_AT=2
 if "$TEST_REPO/compile_all.sh"; then
@@ -139,6 +161,71 @@ if [ ! -f "$TEST_REPO/output/test/sentinel.pdf" ]; then
 fi
 if compgen -G "$TEST_REPO/output/test/presentation_*.pdf" >/dev/null; then
   printf 'FAIL: a warning-bearing run should not publish a partial matrix\n' >&2
+  exit 1
+fi
+
+rm -f "$FAKE_COUNT_FILE"
+export FAKE_MISSING_LOG_AT=2
+if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/missing-log.log" 2>&1; then
+  printf 'FAIL: a missing final log should fail compile_all.sh\n' >&2
+  exit 1
+fi
+unset FAKE_MISSING_LOG_AT
+
+if ! rg --fixed-strings --quiet 'presentation_10pt_1610_light.log was not produced' "$TEST_ROOT/missing-log.log"; then
+  printf 'FAIL: a missing final log should have a specific diagnostic\n' >&2
+  exit 1
+fi
+if [ ! -f "$TEST_REPO/output/test/sentinel.pdf" ]; then
+  printf 'FAIL: a missing-log run should preserve the previous output directory\n' >&2
+  exit 1
+fi
+
+rm -f "$FAKE_COUNT_FILE"
+export FAKE_GREP_ERROR=1
+if "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/grep-error.log" 2>&1; then
+  printf 'FAIL: a final-log search error should fail compile_all.sh\n' >&2
+  exit 1
+fi
+unset FAKE_GREP_ERROR
+
+if ! rg --fixed-strings --quiet 'unable to inspect presentation_10pt_43_light.log' "$TEST_ROOT/grep-error.log"; then
+  printf 'FAIL: a final-log search error should have a specific diagnostic\n' >&2
+  exit 1
+fi
+if [ ! -f "$TEST_REPO/output/test/sentinel.pdf" ]; then
+  printf 'FAIL: a final-log search error should preserve the previous output directory\n' >&2
+  exit 1
+fi
+
+if PATH="$FALLBACK_BIN" "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/missing-lualatex.log" 2>&1; then
+  printf 'FAIL: fallback mode should fail when lualatex is unavailable\n' >&2
+  exit 1
+fi
+if ! rg --fixed-strings --quiet 'latexmk not found and lualatex is required for fallback builds' "$TEST_ROOT/missing-lualatex.log"; then
+  printf 'FAIL: missing fallback lualatex should have a specific preflight diagnostic\n' >&2
+  exit 1
+fi
+
+cat > "$FALLBACK_BIN/lualatex" <<'FAKE_LUALATEX'
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf 'lualatex invoked\n' >> "$FAKE_FALLBACK_INVOCATIONS"
+exit 99
+FAKE_LUALATEX
+chmod +x "$FALLBACK_BIN/lualatex"
+export FAKE_FALLBACK_INVOCATIONS="$TEST_ROOT/fallback-invocations"
+if PATH="$FALLBACK_BIN" "$TEST_REPO/compile_all.sh" > "$TEST_ROOT/missing-biber.log" 2>&1; then
+  printf 'FAIL: fallback mode should fail when biber is unavailable\n' >&2
+  exit 1
+fi
+if ! rg --fixed-strings --quiet 'latexmk not found and biber is required for bibliography builds' "$TEST_ROOT/missing-biber.log"; then
+  printf 'FAIL: missing fallback biber should have a specific preflight diagnostic\n' >&2
+  exit 1
+fi
+if [ -e "$FAKE_FALLBACK_INVOCATIONS" ]; then
+  printf 'FAIL: fallback commands should not run before all fallback dependencies pass preflight\n' >&2
   exit 1
 fi
 
@@ -281,5 +368,34 @@ if [ ! -f "$TEST_REPO/.build-presentation-variants.lock" ]; then
   exit 1
 fi
 "$FAKE_REAL_RM" -f "$TEST_REPO/.build-presentation-variants.lock"
+
+REAP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/compile-all-reap-check.XXXXXX")
+REAP_READY="$REAP_ROOT/ready"
+REAP_DONE="$REAP_ROOT/done"
+(
+  trap 'sleep 0.5; : > "$REAP_DONE"; exit 0' TERM
+  : > "$REAP_READY"
+  while :; do :; done
+) &
+FIRST_PID=$!
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  [ -f "$REAP_READY" ] && break
+  sleep 0.05
+done
+if [ ! -f "$REAP_READY" ]; then
+  printf 'FAIL: background cleanup probe did not start\n' >&2
+  exit 1
+fi
+cleanup
+trap - EXIT
+if [ ! -f "$REAP_DONE" ]; then
+  wait "$FIRST_PID" >/dev/null 2>&1 || true
+  FIRST_PID=
+  "$FAKE_REAL_RM" -rf "$REAP_ROOT"
+  printf 'FAIL: cleanup should reap the terminated background fake build before returning\n' >&2
+  exit 1
+fi
+FIRST_PID=
+"$FAKE_REAL_RM" -rf "$REAP_ROOT"
 
 printf 'compile_all.sh checks passed.\n'

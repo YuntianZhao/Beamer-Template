@@ -78,14 +78,29 @@ check_before() {
   local second_match
   local first_line
   local second_line
+  local status
 
-  if ! first_match=$(rg --fixed-strings --line-number --max-count 1 -- "$first_pattern" "$file"); then
-    printf 'FAIL: %s (missing first command)\n' "$message" >&2
+  if first_match=$(rg --fixed-strings --line-number --max-count 1 -- "$first_pattern" "$file"); then
+    :
+  else
+    status=$?
+    if [ "$status" -eq 1 ]; then
+      printf 'FAIL: %s (missing first command)\n' "$message" >&2
+    else
+      printf 'FAIL: unable to inspect %s for: %s (first command)\n' "$file" "$message" >&2
+    fi
     fail=1
     return
   fi
-  if ! second_match=$(rg --fixed-strings --line-number --max-count 1 -- "$second_pattern" "$file"); then
-    printf 'FAIL: %s (missing second command)\n' "$message" >&2
+  if second_match=$(rg --fixed-strings --line-number --max-count 1 -- "$second_pattern" "$file"); then
+    :
+  else
+    status=$?
+    if [ "$status" -eq 1 ]; then
+      printf 'FAIL: %s (missing second command)\n' "$message" >&2
+    else
+      printf 'FAIL: unable to inspect %s for: %s (second command)\n' "$file" "$message" >&2
+    fi
     fail=1
     return
   fi
@@ -210,9 +225,22 @@ check_present 'presentation.sty' RELEASING.md 'release instructions should list 
 check_present 'presentation-minimal.tex' RELEASING.md 'release instructions should list presentation-minimal.tex'
 check_present 'LICENSE.txt' RELEASING.md 'release instructions should list LICENSE.txt'
 check_present 'bash tests/template_checks.sh' RELEASING.md 'release instructions should require textual checks'
+check_present 'bash tests/template_checks_checks.sh' RELEASING.md 'release instructions should require textual harness checks'
+check_present 'bash tests/runtime_checks.sh all' RELEASING.md 'release instructions should require focused runtime checks'
+check_present 'bash tests/compile_all_checks.sh' RELEASING.md 'release instructions should require transactional build checks'
 check_present './compile_all.sh' RELEASING.md 'release instructions should require the variant matrix'
-check_present 'latexmk -pdf' RELEASING.md 'release instructions should require pdfLaTeX verification'
+check_present 'latexmk -g -pdf' RELEASING.md 'release instructions should require forced pdfLaTeX verification'
+check_present 'Missing character' RELEASING.md 'release instructions should keep missing characters release-blocking'
 check_present 'gh release create' RELEASING.md 'release instructions should document GitHub release creation'
+check_present 'git merge --ff-only "$REVIEWED_COMMIT"' RELEASING.md 'release instructions should integrate the reviewed commit into local main'
+check_present 'refs/heads/main' RELEASING.md 'release instructions should verify the local main ref'
+check_present 'git push origin HEAD:main' RELEASING.md 'release instructions should push the reviewed HEAD explicitly to remote main'
+check_present 'git fetch origin main' RELEASING.md 'release instructions should refresh remote main before comparing refs'
+check_present 'refs/remotes/origin/main' RELEASING.md 'release instructions should verify the fetched remote main ref'
+check_present 'gh repo view YuntianZhao/Beamer-Template --json visibility,url' RELEASING.md 'release postconditions should verify public visibility'
+check_present 'https://api.github.com/repos/YuntianZhao/Beamer-Template/releases/tags/$version' RELEASING.md 'release postconditions should use the unauthenticated release API'
+check_present 'releases/download/$version/$file' RELEASING.md 'release postconditions should download each public asset'
+check_present 'cmp "$release_dir/$file" "$download_dir/$file"' RELEASING.md 'release postconditions should compare downloaded and tag-derived bytes'
 check_present_multiline '```bash
 set -euo pipefail' RELEASING.md 'release procedure should enable fail-fast behavior at the start of its executable block'
 check_present_multiline 'if ! worktree_status=$(git status --porcelain); then
@@ -234,9 +262,12 @@ check_absent 'git tag -a v1.0.0' RELEASING.md 'release instructions should not h
 check_before 'git tag -a "$version" -m "$version"' 'git cat-file -e "$version^{tag}"' RELEASING.md 'release procedure should verify the annotated tag after creating it'
 check_before 'git cat-file -e "$version^{tag}"' 'git archive "$version"' RELEASING.md 'release procedure should verify the annotated tag before extracting assets'
 check_before 'git archive "$version"' 'for file in presentation.sty presentation-minimal.tex LICENSE.txt; do' RELEASING.md 'release procedure should extract assets before byte-comparing them'
-check_before 'done' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'the complete comparison loop should finish before changing visibility'
-check_before 'done' 'git push origin "$version"' RELEASING.md 'the complete comparison loop should finish before pushing the tag'
-check_before 'done' 'gh release create "$version"' RELEASING.md 'the complete comparison loop should finish before creating the release'
+check_before 'done # tag-derived byte gate' 'git push origin HEAD:main' RELEASING.md 'tag-derived byte gates should finish before pushing reviewed main'
+check_before 'git push origin HEAD:main' 'git fetch origin main' RELEASING.md 'release procedure should fetch remote main after pushing reviewed main'
+check_before 'remote_main_commit=$(git rev-parse refs/remotes/origin/main)' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'release procedure should verify remote main before changing visibility'
+check_before 'done # tag-derived byte gate' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'the complete comparison loop should finish before changing visibility'
+check_before 'done # tag-derived byte gate' 'git push origin "$version"' RELEASING.md 'the complete comparison loop should finish before pushing the tag'
+check_before 'done # tag-derived byte gate' 'gh release create "$version"' RELEASING.md 'the complete comparison loop should finish before creating the release'
 check_before 'git push origin "$version"' 'gh release create "$version"' RELEASING.md 'the verified tag should be pushed before creating the release'
 check_present_multiline 'gh release create "$version" \
   "$release_dir/presentation.sty" \
@@ -244,6 +275,10 @@ check_present_multiline 'gh release create "$version" \
   "$release_dir/LICENSE.txt" \
   --generate-notes \
   --verify-tag' RELEASING.md 'GitHub release assets should all come from the tag-derived release directory'
+check_present '`RELEASING.md` is the single authoritative publication procedure' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should defer publication to the corrected release checklist'
+check_present 'Do not run remote publication commands from this plan.' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should reject its superseded remote-first sequence'
+check_present 'bash tests/template_checks_checks.sh' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should run textual harness checks'
+check_present 'Please \(re\)run Biber|Missing character' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should keep missing characters release-blocking'
 check_present 'RELEASING.md' AGENTS.md 'agent instructions should point to the release checklist'
 
 exit "$fail"

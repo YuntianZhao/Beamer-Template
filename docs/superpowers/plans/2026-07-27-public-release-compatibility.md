@@ -1392,6 +1392,7 @@ Run:
 
 ```sh
 bash tests/template_checks.sh
+bash tests/template_checks_checks.sh
 bash tests/runtime_checks.sh all
 bash tests/compile_all_checks.sh
 ```
@@ -1429,7 +1430,7 @@ Expected: all three commands exit zero.
 Run:
 
 ```sh
-rg 'Overfull \\[hv]box|LaTeX Font Warning|Package biblatex Warning: Conflicting options|There were undefined references|Please rerun LaTeX|Please \(re\)run Biber' .engine-check -g '*.log'
+rg 'Overfull \\[hv]box|LaTeX Font Warning|Package biblatex Warning: Conflicting options|There were undefined references|Please rerun LaTeX|Please \(re\)run Biber|Missing character' .engine-check -g '*.log'
 ```
 
 Expected: exit 1 with no matches.
@@ -1496,115 +1497,32 @@ git diff --check origin/main...HEAD
 
 Expected: clean worktree; only the design, plan, runtime, tests, build tooling, and documentation changes described above; no secrets or generated PDFs.
 
-- [ ] **Step 9: Push the verified main branch**
+- [ ] **Step 9: Hand publication off to the authoritative checklist**
 
-Preflight the external publication tools before changing remote state:
+Do not run remote publication commands from this plan.
+`RELEASING.md` is the single authoritative publication procedure and supersedes
+the former remote-first Steps 9-15.
 
-```sh
-for command_name in gh curl tar cmp; do
-  command -v "$command_name"
-done
-```
+After the owner approves remote mutation, follow `RELEASING.md` from **Prepare
+Reviewed Main** through **Release Record** without reordering or selecting only
+individual commands. That procedure binds the reviewed SHA to local `main`,
+runs all focused and engine gates, creates and byte-checks the local annotated
+tag before remote mutation, pushes and verifies reviewed `HEAD:main` before
+changing visibility, and checks public API discovery and downloaded bytes after
+release creation.
 
-Expected: every command prints an executable path.
+Expected before approval: no push, visibility change, tag creation/deletion, or
+release operation has occurred. Expected after an approved publication run: all
+`RELEASING.md` preconditions, ordering gates, and postconditions pass.
 
-Run:
+- [ ] **Step 10: Report verification and publication evidence**
 
-```sh
-git push origin main
-```
+Before publication, report the reviewed commit, focused suites, six serial
+engine builds and final-log scan, 12-variant matrix, clean-history audit, and
+the explicit no-remote-mutation state.
 
-Expected: `origin/main` advances to the reviewed implementation commit.
-
-- [ ] **Step 10: Make the repository public and verify visibility**
-
-Run:
-
-```sh
-gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences
-gh repo view YuntianZhao/Beamer-Template --json visibility,url --jq '.visibility + " " + .url'
-```
-
-Expected:
-
-```text
-PUBLIC https://github.com/YuntianZhao/Beamer-Template
-```
-
-- [ ] **Step 11: Create and push the annotated release tag**
-
-Confirm the worktree remains clean, then run:
-
-```sh
-git status --short --branch
-git tag -a v1.1.0 -m "v1.1.0"
-git push origin v1.1.0
-```
-
-Expected: annotated tag `v1.1.0` points to the reviewed public main-branch commit.
-
-- [ ] **Step 12: Extract and compare release assets from the tag**
-
-Run:
-
-```sh
-release_dir=$(mktemp -d "${TMPDIR:-/tmp}/beamer-template-v1.1.0.XXXXXX")
-git archive v1.1.0 presentation.sty presentation-minimal.tex LICENSE.txt | tar -x -C "$release_dir"
-for file in presentation.sty presentation-minimal.tex LICENSE.txt; do
-  git show "v1.1.0:$file" | cmp - "$release_dir/$file"
-done
-```
-
-Expected: every `cmp` exits zero.
-
-- [ ] **Step 13: Create GitHub release `v1.1.0` from tag-derived assets**
-
-Run in the same shell where `release_dir` is set:
-
-```sh
-gh release create v1.1.0 \
-  "$release_dir/presentation.sty" \
-  "$release_dir/presentation-minimal.tex" \
-  "$release_dir/LICENSE.txt" \
-  --generate-notes \
-  --verify-tag
-```
-
-Expected: command exits zero and prints the release URL.
-
-- [ ] **Step 14: Verify release assets and public unauthenticated discovery**
-
-Run:
-
-```sh
-gh release view v1.1.0 --repo YuntianZhao/Beamer-Template --json tagName,url,assets
-curl --fail --silent --show-error https://api.github.com/repos/YuntianZhao/Beamer-Template/releases/tags/v1.1.0 > "$release_dir/public-release.json"
-rg --fixed-strings 'presentation.sty' "$release_dir/public-release.json"
-rg --fixed-strings 'presentation-minimal.tex' "$release_dir/public-release.json"
-rg --fixed-strings 'LICENSE.txt' "$release_dir/public-release.json"
-```
-
-Download and compare the published bytes:
-
-```sh
-download_dir=$(mktemp -d "${TMPDIR:-/tmp}/beamer-template-download.XXXXXX")
-gh release download v1.1.0 --repo YuntianZhao/Beamer-Template --dir "$download_dir"
-for file in presentation.sty presentation-minimal.tex LICENSE.txt; do
-  cmp "$release_dir/$file" "$download_dir/$file"
-done
-rm -rf "$download_dir" "$release_dir"
-```
-
-Expected: API access works without a private repository token, all three asset names are present, and downloaded bytes match the tag-derived files.
-
-- [ ] **Step 15: Report publication evidence**
-
-Report:
-
-- The final main-branch commit SHA.
-- Repository URL and confirmed `PUBLIC` visibility.
-- Release URL for `v1.1.0`.
-- Passing focused, engine, and 12-variant commands.
-- Clean-history audit result.
-- The explicit exclusions: accessibility and handout mode unchanged.
-- The unresolved README-only upstream MIT notice risk selected by the owner.
+After an owner-approved publication run, add the local/remote main and tag
+target SHA agreement, repository URL and `PUBLIC` visibility, release URL,
+unauthenticated API result, all three public asset byte comparisons, and any
+failed/retried gate. Keep accessibility and handout mode explicitly excluded
+and retain the owner-selected README-only upstream MIT notice concern.
