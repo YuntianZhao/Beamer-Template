@@ -49,6 +49,55 @@ check_present() {
   fail=1
 }
 
+check_present_multiline() {
+  local pattern="$1"
+  local file="$2"
+  local message="$3"
+  local status
+
+  if rg --fixed-strings --multiline --quiet -- "$pattern" "$file"; then
+    return
+  else
+    status=$?
+  fi
+
+  if [ "$status" -eq 1 ]; then
+    printf 'FAIL: %s\n' "$message" >&2
+  else
+    printf 'FAIL: unable to inspect %s for: %s\n' "$file" "$message" >&2
+  fi
+  fail=1
+}
+
+check_before() {
+  local first_pattern="$1"
+  local second_pattern="$2"
+  local file="$3"
+  local message="$4"
+  local first_match
+  local second_match
+  local first_line
+  local second_line
+
+  if ! first_match=$(rg --fixed-strings --line-number --max-count 1 -- "$first_pattern" "$file"); then
+    printf 'FAIL: %s (missing first command)\n' "$message" >&2
+    fail=1
+    return
+  fi
+  if ! second_match=$(rg --fixed-strings --line-number --max-count 1 -- "$second_pattern" "$file"); then
+    printf 'FAIL: %s (missing second command)\n' "$message" >&2
+    fail=1
+    return
+  fi
+
+  first_line=${first_match%%:*}
+  second_line=${second_match%%:*}
+  if [ "$first_line" -ge "$second_line" ]; then
+    printf 'FAIL: %s\n' "$message" >&2
+    fail=1
+  fi
+}
+
 check_absent_regex() {
   local pattern="$1"
   local file="$2"
@@ -164,10 +213,31 @@ check_present 'bash tests/template_checks.sh' RELEASING.md 'release instructions
 check_present './compile_all.sh' RELEASING.md 'release instructions should require the variant matrix'
 check_present 'latexmk -pdf' RELEASING.md 'release instructions should require pdfLaTeX verification'
 check_present 'gh release create' RELEASING.md 'release instructions should document GitHub release creation'
-check_present 'test -z "$(git status --porcelain)"' RELEASING.md 'release instructions should reject a dirty tree'
-check_present 'git archive "$version"' RELEASING.md 'release assets should be extracted from the tag'
-check_present 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'release instructions should document public visibility'
+check_present_multiline '```bash
+set -euo pipefail' RELEASING.md 'release procedure should enable fail-fast behavior at the start of its executable block'
+check_present_multiline 'test -z "$(git status --porcelain)" || {
+  printf '\''ERROR: working tree is dirty.\n'\'' >&2
+  exit 1
+}' RELEASING.md 'release instructions should enforce the clean-tree guard'
+check_present 'git tag -a "$version" -m "$version"' RELEASING.md 'release procedure should create a parameterized annotated tag locally'
+check_present 'git cat-file -e "$version^{tag}"' RELEASING.md 'release procedure should verify the local annotated tag object'
+check_present 'git archive "$version" presentation.sty presentation-minimal.tex LICENSE.txt' RELEASING.md 'all release assets should be extracted from the tag'
+check_present 'for file in presentation.sty presentation-minimal.tex LICENSE.txt; do' RELEASING.md 'all release assets should be byte-compared with their tagged versions'
+check_present 'gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences' RELEASING.md 'release instructions should document the exact public visibility command'
 check_absent 'git tag -a v1.0.0' RELEASING.md 'release instructions should not hard-code the initial tag command'
+check_before 'git tag -a "$version" -m "$version"' 'git cat-file -e "$version^{tag}"' RELEASING.md 'release procedure should verify the annotated tag after creating it'
+check_before 'git cat-file -e "$version^{tag}"' 'git archive "$version"' RELEASING.md 'release procedure should verify the annotated tag before extracting assets'
+check_before 'git archive "$version"' 'cmp - "$release_dir/$file"' RELEASING.md 'release procedure should extract assets before byte-comparing them'
+check_before 'cmp - "$release_dir/$file"' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'all local provenance gates should pass before changing visibility'
+check_before 'cmp - "$release_dir/$file"' 'git push origin "$version"' RELEASING.md 'all local provenance gates should pass before pushing the tag'
+check_before 'cmp - "$release_dir/$file"' 'gh release create "$version"' RELEASING.md 'all local provenance gates should pass before creating the release'
+check_before 'git push origin "$version"' 'gh release create "$version"' RELEASING.md 'the verified tag should be pushed before creating the release'
+check_present_multiline 'gh release create "$version" \
+  "$release_dir/presentation.sty" \
+  "$release_dir/presentation-minimal.tex" \
+  "$release_dir/LICENSE.txt" \
+  --generate-notes \
+  --verify-tag' RELEASING.md 'GitHub release assets should all come from the tag-derived release directory'
 check_present 'RELEASING.md' AGENTS.md 'agent instructions should point to the release checklist'
 
 exit "$fail"

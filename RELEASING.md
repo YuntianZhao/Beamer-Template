@@ -42,17 +42,21 @@ and other material that must not be published. Tagging, pushing, changing
 visibility, and release creation require explicit user approval.
 
 ```bash
+set -euo pipefail
+
 version=v1.1.0
-test -z "$(git status --porcelain)"
+test -z "$(git status --porcelain)" || {
+  printf 'ERROR: working tree is dirty.\n' >&2
+  exit 1
+}
 git rev-parse --verify HEAD
 if git rev-parse --verify "$version" >/dev/null 2>&1; then
   printf 'ERROR: tag %s already exists.\n' "$version" >&2
   exit 1
 fi
 
-gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences
 git tag -a "$version" -m "$version"
-git push origin "$version"
+git cat-file -e "$version^{tag}"
 
 release_dir=$(mktemp -d "${TMPDIR:-/tmp}/beamer-template-release.XXXXXX")
 trap 'rm -rf "$release_dir"' EXIT
@@ -61,12 +65,13 @@ for file in presentation.sty presentation-minimal.tex LICENSE.txt; do
   git show "$version:$file" | cmp - "$release_dir/$file"
 done
 
+gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences
+git push origin "$version"
+
 gh release create "$version" \
   "$release_dir/presentation.sty" \
   "$release_dir/presentation-minimal.tex" \
   "$release_dir/LICENSE.txt" \
   --generate-notes \
   --verify-tag
-rm -rf "$release_dir"
-trap - EXIT
 ```
