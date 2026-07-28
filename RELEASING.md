@@ -45,10 +45,14 @@ visibility, and release creation require explicit user approval.
 set -euo pipefail
 
 version=v1.1.0
-test -z "$(git status --porcelain)" || {
+if ! worktree_status=$(git status --porcelain); then
+  printf 'ERROR: unable to inspect working tree status.\n' >&2
+  exit 1
+fi
+if [ -n "$worktree_status" ]; then
   printf 'ERROR: working tree is dirty.\n' >&2
   exit 1
-}
+fi
 git rev-parse --verify HEAD
 if git rev-parse --verify "$version" >/dev/null 2>&1; then
   printf 'ERROR: tag %s already exists.\n' "$version" >&2

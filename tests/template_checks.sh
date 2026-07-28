@@ -215,22 +215,28 @@ check_present 'latexmk -pdf' RELEASING.md 'release instructions should require p
 check_present 'gh release create' RELEASING.md 'release instructions should document GitHub release creation'
 check_present_multiline '```bash
 set -euo pipefail' RELEASING.md 'release procedure should enable fail-fast behavior at the start of its executable block'
-check_present_multiline 'test -z "$(git status --porcelain)" || {
+check_present_multiline 'if ! worktree_status=$(git status --porcelain); then
+  printf '\''ERROR: unable to inspect working tree status.\n'\'' >&2
+  exit 1
+fi
+if [ -n "$worktree_status" ]; then
   printf '\''ERROR: working tree is dirty.\n'\'' >&2
   exit 1
-}' RELEASING.md 'release instructions should enforce the clean-tree guard'
+fi' RELEASING.md 'release instructions should fail closed before testing the captured worktree status'
 check_present 'git tag -a "$version" -m "$version"' RELEASING.md 'release procedure should create a parameterized annotated tag locally'
 check_present 'git cat-file -e "$version^{tag}"' RELEASING.md 'release procedure should verify the local annotated tag object'
 check_present 'git archive "$version" presentation.sty presentation-minimal.tex LICENSE.txt' RELEASING.md 'all release assets should be extracted from the tag'
-check_present 'for file in presentation.sty presentation-minimal.tex LICENSE.txt; do' RELEASING.md 'all release assets should be byte-compared with their tagged versions'
+check_present_multiline 'for file in presentation.sty presentation-minimal.tex LICENSE.txt; do
+  git show "$version:$file" | cmp - "$release_dir/$file"
+done' RELEASING.md 'all three tagged-file comparisons should remain in one contiguous loop'
 check_present 'gh repo edit YuntianZhao/Beamer-Template --visibility public --accept-visibility-change-consequences' RELEASING.md 'release instructions should document the exact public visibility command'
 check_absent 'git tag -a v1.0.0' RELEASING.md 'release instructions should not hard-code the initial tag command'
 check_before 'git tag -a "$version" -m "$version"' 'git cat-file -e "$version^{tag}"' RELEASING.md 'release procedure should verify the annotated tag after creating it'
 check_before 'git cat-file -e "$version^{tag}"' 'git archive "$version"' RELEASING.md 'release procedure should verify the annotated tag before extracting assets'
-check_before 'git archive "$version"' 'cmp - "$release_dir/$file"' RELEASING.md 'release procedure should extract assets before byte-comparing them'
-check_before 'cmp - "$release_dir/$file"' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'all local provenance gates should pass before changing visibility'
-check_before 'cmp - "$release_dir/$file"' 'git push origin "$version"' RELEASING.md 'all local provenance gates should pass before pushing the tag'
-check_before 'cmp - "$release_dir/$file"' 'gh release create "$version"' RELEASING.md 'all local provenance gates should pass before creating the release'
+check_before 'git archive "$version"' 'for file in presentation.sty presentation-minimal.tex LICENSE.txt; do' RELEASING.md 'release procedure should extract assets before byte-comparing them'
+check_before 'done' 'gh repo edit YuntianZhao/Beamer-Template --visibility public' RELEASING.md 'the complete comparison loop should finish before changing visibility'
+check_before 'done' 'git push origin "$version"' RELEASING.md 'the complete comparison loop should finish before pushing the tag'
+check_before 'done' 'gh release create "$version"' RELEASING.md 'the complete comparison loop should finish before creating the release'
 check_before 'git push origin "$version"' 'gh release create "$version"' RELEASING.md 'the verified tag should be pushed before creating the release'
 check_present_multiline 'gh release create "$version" \
   "$release_dir/presentation.sty" \
