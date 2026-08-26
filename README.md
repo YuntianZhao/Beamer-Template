@@ -29,7 +29,7 @@ latexmk -lualatex presentation-minimal.tex
 
 Biber is required, including for the minimal starter, because `presentation.sty` loads the `biblatex-chicago` backend. Use `latexmk` so Biber and all required LaTeX reruns are invoked automatically.
 
-A complete TeX Live installation is the simplest setup. Package-level installations need Beamer, `iftex`, Libertinus and XITS fonts, Source Code Pro, `unicode-math`, `mathalpha`, `setspace`, `microtype`, `etoolbox`, `biblatex-chicago`, `listings`, `algorithm`, `algorithmicx`, `adjustbox`, `booktabs`, `multirow`, and `xtab`.
+A complete TeX Live installation is the simplest setup. Package-level installations need Beamer, `iftex`, Libertinus and XITS fonts, Cascadia Code, `unicode-math`, `mathalpha`, `setspace`, `microtype`, `etoolbox`, `biblatex-chicago`, `listings`, `algorithm`, `algorithmicx`, `adjustbox`, `booktabs`, `multirow`, and `xtab`.
 
 ## Preamble Controls
 

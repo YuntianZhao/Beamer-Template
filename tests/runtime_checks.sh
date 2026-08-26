@@ -199,9 +199,17 @@ check_url() {
 
 check_sample() {
   compile_source presentation-default lualatex presentation.tex
+  pdffonts "$BUILD_ROOT/presentation-default/presentation-default.pdf" \
+    > "$BUILD_ROOT/presentation-default/presentation-default.fonts"
+  assert_present 'CascadiaCode' "$BUILD_ROOT/presentation-default/presentation-default.fonts" \
+    'default LuaLaTeX sample should embed Cascadia Code'
   assert_clean_log "$BUILD_ROOT/presentation-default/presentation-default.log" 'default LuaLaTeX sample should be warning-clean'
 
   compile_source presentation-default-pdf pdflatex presentation.tex
+  pdffonts "$BUILD_ROOT/presentation-default-pdf/presentation-default-pdf.pdf" \
+    > "$BUILD_ROOT/presentation-default-pdf/presentation-default-pdf.fonts"
+  assert_present 'CascadiaCode' "$BUILD_ROOT/presentation-default-pdf/presentation-default-pdf.fonts" \
+    'default pdfLaTeX sample should embed Cascadia Code'
   assert_clean_log "$BUILD_ROOT/presentation-default-pdf/presentation-default-pdf.log" 'default pdfLaTeX sample should be warning-clean'
 
   compile_source presentation-12pt-169 lualatex tests/fixtures/presentation-12pt-169.tex

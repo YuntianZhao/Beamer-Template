@@ -36,7 +36,14 @@
 \let\mathbfscr\relax
 \let\mathbffrak\relax
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
-\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\setmonofont[
+  Scale=1.0,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic
+]{CascadiaCode} % Monospace font
 \let\bm\symbf
 \newcommand{\mathbcal}[1]{\symbfcal{#1}}
 \newcommand{\mathbscr}[1]{\mathbfscr{#1}}
@@ -50,7 +57,14 @@
 \let\mathbfscr\relax
 \let\mathbffrak\relax
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
-\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\setmonofont[
+  Scale=1.0,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic
+]{CascadiaCode} % Monospace font
 \let\bm\symbf
 \newcommand{\mathbcal}[1]{\symbfcal{#1}}
 \newcommand{\mathbscr}[1]{\mathbfscr{#1}}
@@ -63,7 +77,7 @@
 \usepackage[upint]{libertinust1math} % Use Libertinus math font
 \renewcommand{\sfdefault}{LibertinusSans-TLF}
 \renewcommand{\familydefault}{\sfdefault}
-\usepackage[scale=.85]{sourcecodepro} % Monospace font
+\usepackage[scale=1.0]{cascadia-code} % Monospace font
 \DeclareFontShape{T1}{LibertinusSans-TLF}{b}{it}{%
   <-> ssub * LibertinusSans-TLF/m/it}{}
 \usepackage[cal=stixplain, scr=boondox, frak=euler]{mathalfa} % Lowercase and bold math alphabets
