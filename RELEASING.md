@@ -98,7 +98,7 @@ block in the same shell used to export `REVIEWED_COMMIT` above.
 set -euo pipefail
 
 : "${REVIEWED_COMMIT:?Set REVIEWED_COMMIT to the full commit SHA approved by the final review}"
-version=v1.1.0
+version=v1.2.0
 
 for command_name in gh curl tar cmp rg; do
   command -v "$command_name" >/dev/null
