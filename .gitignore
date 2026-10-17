@@ -22,9 +22,6 @@ auto/
 .engine-check/
 .worktrees/
 
-# AI generated plans
-docs/superpowers/*
-
 # Generated presentation PDFs
 presentation.pdf
 presentation_light.pdf

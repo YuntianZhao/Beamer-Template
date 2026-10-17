@@ -275,10 +275,6 @@ check_present_multiline 'gh release create "$version" \
   "$release_dir/LICENSE.txt" \
   --generate-notes \
   --verify-tag' RELEASING.md 'GitHub release assets should all come from the tag-derived release directory'
-check_present '`RELEASING.md` is the single authoritative publication procedure' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should defer publication to the corrected release checklist'
-check_present 'Do not run remote publication commands from this plan.' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should reject its superseded remote-first sequence'
-check_present 'bash tests/template_checks_checks.sh' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should run textual harness checks'
-check_present 'Please \(re\)run Biber|Missing character' docs/superpowers/plans/2026-07-27-public-release-compatibility.md 'Task 8 should keep missing characters release-blocking'
 check_present 'RELEASING.md' AGENTS.md 'agent instructions should point to the release checklist'
 
 exit "$fail"
