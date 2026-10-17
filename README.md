@@ -88,6 +88,8 @@ The sample deck demonstrates common research-seminar slide types:
 - Theorems, lemmas, propositions, assumptions, and remarks
 - Backup slides with navigation buttons
 
+Code listings and other monospaced text use Cascadia Code with ligatures disabled on all supported engines. Operators such as `!=`, `<=`, and `->` remain separate characters.
+
 Use `\begin{singlespace} ... \end{singlespace}` locally for dense slides. The default spacing remains generous to encourage sparse slides.
 
 ## Bibliography

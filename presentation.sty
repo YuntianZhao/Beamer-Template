@@ -38,6 +38,7 @@
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
 \setmonofont[
   Scale=1.0,
+  RawFeature={-calt,-liga,-clig}, % Disable contextual and standard code ligatures
   Extension=.otf,
   UprightFont=*-Regular,
   ItalicFont=*-Italic,
@@ -59,6 +60,7 @@
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
 \setmonofont[
   Scale=1.0,
+  RawFeature={-calt,-liga,-clig}, % Disable contextual and standard code ligatures
   Extension=.otf,
   UprightFont=*-Regular,
   ItalicFont=*-Italic,
@@ -121,9 +123,16 @@
 % Set spacing on lines
 \usepackage{microtype}
 
-% Remove ligatures
+% Remove text f-ligatures and all code-font ligatures
 \ifxetex\else
 \DisableLigatures[f]{encoding = T1, family = * }
+\fi
+\ifpdftex
+% Disable TeX punctuation ligatures whenever a code font shape is selected.
+\AddToHook{selectfont}{%
+  \ifnum\pdfstrcmp{\f@family}{\ttdefault}=0\relax
+    \pdfnoligatures\font
+  \fi}
 \fi
 
 % ---- Adjust font sizes and shapes ----
