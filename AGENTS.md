@@ -88,3 +88,17 @@ GitHub release procedure. A public release requires:
 
 Never tag, push, change repository visibility, or create a release without
 explicit user approval.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs (including PRDs) are tracked in GitHub Issues via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default canonical triage labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Before exploring the codebase, read `docs/agents/domain.md` for this repo's single-context glossary and ADR rules.
