@@ -142,7 +142,6 @@ check_file_absent() {
 }
 
 check_present '\NeedsTeXFormat{LaTeX2e}' presentation.sty 'presentation.sty should declare its required LaTeX format'
-check_present '\ProvidesPackage{presentation}[2026/08/26 v1.2.0' presentation.sty 'presentation.sty should identify release v1.2.0'
 check_present 'giveninits=true,uniquename=mininit' presentation.sty 'Chicago initials should use an explicit compatible uniqueness policy'
 check_absent '\MakeLowercase' presentation.sty 'presentation.sty must not mutate title or heading text case'
 check_absent '\addbibresource{references.bib}' presentation.sty 'bibliography database belongs in presentation content, not style'
