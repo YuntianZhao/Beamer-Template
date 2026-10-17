@@ -37,7 +37,7 @@
 \let\mathbffrak\relax
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
 \setmonofont[
-  Scale=1.0,
+  Scale=0.9,
   RawFeature={-calt,-liga,-clig}, % Disable contextual and standard code ligatures
   Extension=.otf,
   UprightFont=*-Regular,
@@ -59,7 +59,7 @@
 \let\mathbffrak\relax
 \usepackage[scr=boondox, frak=euler]{mathalfa} % Distinct lowercase and bold script letters
 \setmonofont[
-  Scale=1.0,
+  Scale=0.9,
   RawFeature={-calt,-liga,-clig}, % Disable contextual and standard code ligatures
   Extension=.otf,
   UprightFont=*-Regular,
@@ -79,7 +79,7 @@
 \usepackage[upint]{libertinust1math} % Use Libertinus math font
 \renewcommand{\sfdefault}{LibertinusSans-TLF}
 \renewcommand{\familydefault}{\sfdefault}
-\usepackage[scale=1.0]{cascadia-code} % Monospace font
+\usepackage[scale=0.9]{cascadia-code} % Monospace font
 \DeclareFontShape{T1}{LibertinusSans-TLF}{b}{it}{%
   <-> ssub * LibertinusSans-TLF/m/it}{}
 \usepackage[cal=stixplain, scr=boondox, frak=euler]{mathalfa} % Lowercase and bold math alphabets
@@ -136,15 +136,6 @@
 \fi
 
 % ---- Adjust font sizes and shapes ----
-
-% Scale inline code once; leave listings and URL fonts unchanged.
-\DeclareTextFontCommand{\texttt}{%
-  \edef\@tempa{\ttdefault}%
-  \ifx\f@family\@tempa\else
-    \@tempdima=\f@size pt\relax
-    \fontsize{0.9\@tempdima}{\f@baselineskip}%
-  \fi
-  \ttfamily}
 
 % Set title font
 \setbeamerfont{title}{size=\huge, shape=\scshape}
@@ -318,7 +309,7 @@
 
 \usepackage{listings}
 \lstdefinestyle{minimalcode}{
-  basicstyle=\ttfamily\small,
+  basicstyle=\ttfamily\footnotesize,
   backgroundcolor=\color{GitHubCanvasSubtle},
   keywordstyle=\color{GitHubCodeKeyword},
   commentstyle=\color{GitHubCodeComment},

@@ -90,7 +90,7 @@ The sample deck demonstrates common research-seminar slide types:
 
 Code listings and other monospaced text use Cascadia Code with ligatures disabled on all supported engines. Operators such as `!=`, `<=`, and `->` remain separate characters.
 
-Inline code written with `\texttt{...}` is scaled to 90% of the surrounding text size. Code listings use `\small`, one standard size below normal text, and URL fonts are unchanged.
+The Cascadia Code family is uniformly scaled to 90% on every engine, covering inline code, listings, and typewriter URLs. Listings select `\footnotesize` before this scale is applied; inline `\texttt{...}` inherits the surrounding size without an additional reduction.
 
 Use `\begin{singlespace} ... \end{singlespace}` locally for dense slides. The default spacing remains generous to encourage sparse slides.
 
