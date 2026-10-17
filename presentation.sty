@@ -137,6 +137,15 @@
 
 % ---- Adjust font sizes and shapes ----
 
+% Scale inline code once; leave listings and URL fonts unchanged.
+\DeclareTextFontCommand{\texttt}{%
+  \edef\@tempa{\ttdefault}%
+  \ifx\f@family\@tempa\else
+    \@tempdima=\f@size pt\relax
+    \fontsize{0.9\@tempdima}{\f@baselineskip}%
+  \fi
+  \ttfamily}
+
 % Set title font
 \setbeamerfont{title}{size=\huge, shape=\scshape}
 \setbeamerfont{subtitle}{size=\large}
@@ -309,7 +318,7 @@
 
 \usepackage{listings}
 \lstdefinestyle{minimalcode}{
-  basicstyle=\ttfamily\scriptsize,
+  basicstyle=\ttfamily\small,
   backgroundcolor=\color{GitHubCanvasSubtle},
   keywordstyle=\color{GitHubCodeKeyword},
   commentstyle=\color{GitHubCodeComment},
